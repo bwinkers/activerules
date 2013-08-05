@@ -118,6 +118,34 @@ class Activerules_Site {
 	{
 		self::$_storage = $storage;
 	}
+	
+	public static function config($dot_path=NULL, $default=FALSE)
+	{
+		if($dot_path===NULL)
+		{
+			return self::$_config;
+		}
+		else
+		{
+			$keys = explode('.', $dot_path);
+			
+			$config = self::$_config;
+			
+			while($key = array_shift($keys))
+			{
+				if(isset($config[$key]))
+				{
+					$config = $config[$key];
+				}
+				else
+				{
+					return $default;
+				}
+			}
+
+			return $config;
+		}
+	}
 
 	
 } // End Site Class

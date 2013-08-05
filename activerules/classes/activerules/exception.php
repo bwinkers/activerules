@@ -1,4 +1,4 @@
-<?php defined('SYSPATH') or die('No direct access');
+<?php defined('AR_VERSION') or die('No direct access');
 /**
  *
  */
@@ -48,7 +48,7 @@ class Activerules_Exception extends Exception {
 		}
 
 		// Set the message
-		$message = __($message, $variables);
+		//$message = __($message, $variables);
 
 		// Pass the message and integer code to the parent
 		parent::__construct($message, (int) $code);
@@ -122,47 +122,27 @@ class Activerules_Exception extends Exception {
 			// Create a text version of the exception
 			$error = Activerules_Exception::text($e);
 
-			if (is_object(Kohana::$log))
-			{
-				// Add this exception to the log
-				Kohana::$log->add(Log::ERROR, $error);
-
-				$strace = Activerules_Exception::text($e)."\n--\n" . $e->getTraceAsString();
-				Kohana::$log->add(Log::STRACE, $strace);
-
-				// Make sure the logs are written
-				Kohana::$log->write();
-			}
-
-			if (Kohana::$is_cli)
-			{
-				// Just display the text of the exception
-				echo "\n{$error}\n";
-
-				exit(1);
-			}
-
 			if ( ! headers_sent())
 			{
 				// Make sure the proper http header is sent
 				$http_header_status = ($e instanceof HTTP_Exception) ? $code : 500;
 
-				header('Content-Type: '.Activerules_Exception::$error_view_content_type.'; charset='.Kohana::$charset, TRUE, $http_header_status);
+				header('Content-Type: '.Activerules_Exception::$error_view_content_type.'; charset='.AR::$charset, TRUE, $http_header_status);
 			}
 
-			if (Request::$current !== NULL AND Request::current()->is_ajax() === TRUE)
-			{
+		//	if (Request::$current !== NULL AND Request::current()->is_ajax() === TRUE)
+		//	{
 				// Just display the text of the exception
-				echo "\n{$error}\n";
+		//		echo "\n{$error}\n";
 
-				exit(1);
-			}
+		//		exit(1);
+		//	}
 
 			// Start an output buffer
 			ob_start();
 
 			// Include the exception HTML
-			if ($view_file = Kohana::find_file('views', Activerules_Exception::$error_view))
+			if ($view_file = AR::find_file('views', Activerules_Exception::$error_view))
 			{
 				include $view_file;
 			}
@@ -201,8 +181,8 @@ class Activerules_Exception extends Exception {
 	 */
 	public static function text(Exception $e)
 	{
-		return sprintf('%s [ %s ]: %s ~ %s [ %d ]',
-			get_class($e), $e->getCode(), strip_tags($e->getMessage()), Debug::path($e->getFile()), $e->getLine());
+		//return sprintf('%s [ %s ]: %s ~ %s [ %d ]',
+		//	get_class($e), $e->getCode(), strip_tags($e->getMessage()), Dbg::path($e->getFile()), $e->getLine());
 	}
 
 } // End Activerules_Exception

@@ -38,7 +38,6 @@ class Activerules_Hostname {
 		}
 
 		self::$_requested_hostname = $hostname;
-
 	}
 	
 	/**
@@ -111,7 +110,7 @@ class Activerules_Hostname {
 		}
 	}
 	
-	public function redirect_host($redirect_config_array)
+	public static function redirect_host($redirect_config_array)
 	{
 		// get the final URL
 		switch($redirect_config_array['target'])
@@ -167,7 +166,7 @@ class Activerules_Hostname {
 				return;
 			}
 		}
-
+		
 		// Perform the redirect
 		header("Location: $protocol://$redirect_target"); 
 	}
@@ -175,7 +174,7 @@ class Activerules_Hostname {
 	/**
 	 * Determines if there is a valid config for this hostname.
 	 */
-	public function configured_hostname($hostname)
+	public static function configured_hostname($hostname)
 	{
 		// If the host is valid there will be a config group with that name
 

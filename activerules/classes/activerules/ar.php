@@ -102,6 +102,16 @@ class Activerules_AR {
 	
 	public function __construct($config_array)
 	{
+		// Enable Activerules exception handling, adds stack traces and error source.
+		set_exception_handler(array('Activerules_Exception', 'handler'));
+
+		// Enable Activerules error handling, converts all PHP errors to exceptions.
+		set_error_handler(array('AR', 'error_handler'));
+
+
+		// Enable the Activerules shutdown handler, which catches E_FATAL errors.
+		register_shutdown_function(array('AR', 'shutdown_handler'));
+		
 		// Set the AR storage if defined
 		if(isset($config_array['config_storage']))
 		{
@@ -126,52 +136,70 @@ class Activerules_AR {
 	 */
 	public function load_site()
 	{
-		/**
-		 * Create the Site class.
-		 * If we passed in a site name it would load that site.
-		 */
-		$site = new Site();
-	
-		/** 
-		 * Pass the ActiveRules config object onto the site storage class.
-		 * This is the primary purpose of defining the AR storage.
-		 * It allows us to look up basic site configuration.
-		 */
-		$site->set_storage(self::$_storage);
+		try
+		{	
+			/**
+			 * Create the Site class.
+			 * If we passed in a site name it would load that site.
+			 */
+			$site = new Site();
 
-		/**
-		 * Load the site
-		 */
-		$site->init_site();
-		
-		/**
-		 * Load the modules from the Site host config
-		 */
-		$modules = $site->get_modules();
-		
-		if($modules)
-		{
-			foreach($modules as $module)
+			/** 
+			 * Pass the ActiveRules config object onto the site storage class.
+			 * This is the primary purpose of defining the AR storage.
+			 * It allows us to look up basic site configuration.
+			 */
+			$site->set_storage(self::$_storage);
+
+			/**
+			 * Load the site
+			 */
+			$site->init_site();
+
+			/**
+			 * Set the sites error_reporting
+			 */
+			error_reporting(Site::config('errors.error_reportings', 0));
+
+			/**
+			 * Load the modules from the Site host config
+			 */
+			$modules = $site->get_modules();
+
+			if($modules)
 			{
-				$mod_path = DOCROOT.'modules'.DIRECTORY_SEPARATOR.$module;
-				
-				$this->add_module($mod_path);
+				foreach($modules as $module)
+				{
+					$mod_path = DOCROOT.'modules'.DIRECTORY_SEPARATOR.$module.DIRECTORY_SEPARATOR;
+
+					$this->add_module($mod_path);
+				}
 			}
+
+			// Create a new Request object now that all the modules are loaded
+			// This sanitizes and stores all environment/request data.
+			// This should be the primary for all processing past this point to look for that data.
+			// very little should be read form the native super globals after this.
+			$request = new Request;
+
+			// Bootstrap the modules
+			// We wait until all modules are loaded to reduce issues with load order dependencies.
+			$this->_bootstrap_modules();
+			
+			$router = new Router(Site::config('routes'));
+			
+			$router->route_request($request);
 		}
-		
-		// Create a new Request object
-		$request = new Request;
-		
-		// Bootstrap the modules
-		// We wait untill all modules are loaded to reduce issues with laod order dependencies.
-		$this->_bootstrap_modules();
+		catch ( Exception $e)
+		{
+			var_export($e);
+		}
 	}
 	
 	public static function add_module($module)
 	{
 		if(is_dir($module))
 		{  		
-			self::$_paths[] = $module;
 			self::$_modules[] = $module;
 		}
 	}
@@ -255,7 +283,7 @@ class Activerules_AR {
 		try
 		{
 			// Transform the class name into a path
-			$file = str_replace('_', '/', strtolower($class));
+			$file = str_replace('_', DIRECTORY_SEPARATOR, strtolower($class));
 
 			$path = self::find_file('classes', $file);
 
@@ -345,13 +373,13 @@ class Activerules_AR {
 			// Array of files that have been found
 			$found = array();
 
-			foreach ($places as $dir)
+			foreach ($places as $place)
 			{
-				if (is_file($dir.$path))
+				if (is_file($place.$path))
 				{
 					//echo '<br>full: '.$dir.$path;
 					// This path has a file, add it to the list
-					$found[] = $dir.$path;
+					$found[] = $place.$path;
 				}
 			}
 		}
@@ -360,13 +388,12 @@ class Activerules_AR {
 			// The file has not been found yet
 			$found = FALSE;
 
-			foreach ($places as $dir)
+			foreach ($places as $place)
 			{
-				if (is_file($dir.$path))
-				{
-					//echo '<br>full: '.$dir.$path;
+				if (is_file($place.$path))
+				{ 
 					// A path has been found
-					$found = $dir.$path;
+					$found = $place.$path;
 
 					// Stop searching
 					break;
@@ -445,6 +472,39 @@ class Activerules_AR {
 		}
 
 		return $found;
+	}
+	
+	/**
+	 * PHP error handler, converts all errors into ErrorExceptions. This handler
+	 * respects error_reporting settings.
+	 *
+	 * @throws  ErrorException
+	 * @return  TRUE
+	 */
+	public static function error_handler($code, $error, $file = NULL, $line = NULL)
+	{
+		if (error_reporting() AND $code)
+		{
+			// This error is not suppressed by current error reporting settings
+			// Convert the error into an ErrorException
+			throw new ErrorException($error, $code, 0, $file, $line);
+		}
+
+		// Do not execute the PHP error handler
+		return TRUE;
+	}
+
+	/**
+	 * Catches errors that are not caught by the error handler, such as E_PARSE.
+	 *
+	 * @uses    Activerules_Exception::handler
+	 * @return  void
+	 */
+	public static function shutdown_handler()
+	{
+		//ob_end_clean();
+		exit(1);
+		
 	}
 
 
