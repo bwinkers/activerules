@@ -20,37 +20,73 @@ if ( ! defined('AR_START_MEMORY'))
 }
 
 /**
+ * Define PHP extension
+ */
+if ( ! defined('EXT'))
+{
+	define('EXT', '.php');
+}
+
+/**
  * Define the ActiveRules version.
  * Modules may use this to determien if they are properly supported.
  * Files look for it as an indication the request was accessed through the index.php file
- *  * http://docs.activerules.com/term/ar_version
  */
 define('AR_VERSION', '7.0');
 
 /**
  * Define DOCROOT as the full path to the docroot
- * http://docs.activerules.com/term/docroot
  */
 define('DOCROOT', realpath(dirname(__FILE__)).DIRECTORY_SEPARATOR);
 
 /**
  * Include the installation specific config file.
  * This configures where certain directories are.
- * http://docs.activerules.com/term/bootstrap_config.php
+ * This should be set once in coordination with a sysadmin.
  */
-include(DOCROOT.'bootstrap_config.php');
+require_once(DOCROOT.'config'.DIRECTORY_SEPARATOR.'bootstrap_config'.EXT);
 
 /**
  * Define ACTIVEPATH
- * This is the path where modules come from and is defined in bootstrap_config.php
- * http://docs.activerules.com/term/activepath
+ * This is the path where the activerules module is located and is defined in bootstrap_config.php
  */
-define('ACTIVEPATH', realpath($activerules_modules).DIRECTORY_SEPARATOR);
+define('ACTIVEPATH', realpath($activerules).DIRECTORY_SEPARATOR);
 
 /**
- * Load the Site class
- * http://docs.activerules.com/term/site
+ * Pass processing over to the bootstrap file
  */
-include(ACTIVEPATH.'objects/site.php');
+// require_once(ACTIVEPATH.'bootstrap'.EXT);
+
+/**
+ * Include the file that defines the AR(ActiveRules) class
+ */
+require_once(ACTIVEPATH.'classes'.DIRECTORY_SEPARATOR.'activerules'.DIRECTORY_SEPARATOR.'ar'.EXT);
+
+/**
+ * Add the Activerules autoloader
+ */
+spl_autoload_register(array('Activerules_AR', 'autoload'));
+
+/**
+ * Define config array based on the bootstrap configs
+ */
+$ar_bootstrap_configs = array(
+	'config_storage'=>$activerules_storage,
+	'cacher'=>$activerules_cacher,
+	'logger'=>$activerules_logger
+);
+
+/**
+ * Create a new AR class instance
+ */
+$ar = new AR($ar_bootstrap_configs);
+
+/**
+ * Load the site.
+ * The site will handle the request after that.
+ */
+$ar->load_site();
+
+echo '<br>Finished in index.php'
 
 ?>
