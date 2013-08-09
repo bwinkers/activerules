@@ -52,7 +52,7 @@ class Activerules_Site {
 	{
 		if($site_alias)
 		{
-			self::$_site_alias = $site_alias;
+			$this->$_site_alias = $site_alias;
 		}
 	}
 	
@@ -94,6 +94,10 @@ class Activerules_Site {
 		return $this;
 	}
 	
+	/**
+	 * get the modules used by this site
+	 * @return type 
+	 */
 	public function get_modules()
 	{
 		if(isset($this->_config['modules']))
@@ -104,11 +108,22 @@ class Activerules_Site {
 		return FALSE;
 	}
 	
+	/**
+	 * Get the site alias for this site.
+	 * This is used for directpry names and such.
+	 * 
+	 * @param type $site_alias 
+	 */
 	public function set_site_alias($site_alias)
 	{
 		$this->_site_alias = $site_alias;
 	}
 	
+	/**
+	 * Process the hostname to deteermine a site.
+	 * 
+	 * @return Hostname object
+	 */
 	public function check_hostname()
 	{
 		// To determine the site we need to get a supported hostname object
@@ -133,6 +148,15 @@ class Activerules_Site {
 		return $this;
 	}
 	
+	/**
+	 * Return site config.
+	 * Will take a default to return if the key is not set.
+	 * The key can be set with NULL, zero, FALSE etc and will still get returned.
+	 * 
+	 * @param type $dot_path
+	 * @param type $default
+	 * @return type 
+	 */
 	public function config($dot_path=NULL, $default=FALSE)
 	{
 		if($dot_path===NULL)
@@ -161,5 +185,4 @@ class Activerules_Site {
 		}
 	}
 
-	
 } // End Site Class
