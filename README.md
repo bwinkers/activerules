@@ -1,4 +1,5 @@
-activerules
+ActiveRules
 ===========
 
-ActiveRules - Advanced PHP framework built on top of Kohana 3.3
+ActiveRules - Advanced PHP framework 
+Optimized for PaaS Operation
