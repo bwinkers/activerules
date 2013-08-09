@@ -108,15 +108,6 @@ class Activerules_AR {
 	private function __construct()
 	{
 		/* PRIVATE */
-		// Enable Activerules exception handling, adds stack traces and error source.
-		//set_exception_handler(array('Activerules_Exception', 'handler'));
-
-		// Enable Activerules error handling, converts all PHP errors to exceptions.
-		//set_error_handler(array('AR', 'error_handler'));
-
-		// Enable the Activerules shutdown handler, which catches E_FATAL errors.
-		//register_shutdown_function(array('AR', 'shutdown_handler'));
-		
 	}
 	
 	public static function instance()
@@ -155,9 +146,7 @@ class Activerules_AR {
 	
 	public static function site($dot_config=NULL, $default=NULL)
 	{
-		echo '<pre>';
-		var_export(self::$_site->config($dot_config, $default));
-// return AR::$_site->config($dot_config, $default);
+		return self::$_site->config($dot_config, $default);
 	}
 	
 	/**
@@ -176,7 +165,7 @@ class Activerules_AR {
 			/**
 			 * Set the sites error_reporting
 			 */
-			//error_reporting($site->config('errors.error_reporting', 0));
+			error_reporting($site->config('errors.error_reporting', 0));
 
 			/**
 			 * Load the modules from the Site host config
@@ -196,6 +185,15 @@ class Activerules_AR {
 			// Bootstrap the modules
 			// We wait until all modules are loaded to reduce issues with load order dependencies.
 			self::_bootstrap_modules();
+			
+			// Enable Activerules exception handling, adds stack traces and error source.
+			//set_exception_handler(array('Activerules_Exception', 'handler'));
+
+			// Enable Activerules error handling, converts all PHP errors to exceptions.
+			//set_error_handler(array('AR', 'error_handler'));
+
+			// Enable the Activerules shutdown handler, which catches E_FATAL errors.
+			//register_shutdown_function(array('AR', 'shutdown_handler'));
 	
 			self::$_site = $site;
 

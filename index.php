@@ -109,16 +109,13 @@ $ar_bootstrap_configs = array(
  * But it needs to provide core services to various sub levels
  *     
  */
-$ar = AR::instance()->configure($ar_bootstrap_configs)->load_site();
-
+$ar = AR::instance()
+		// Configure the ActiveRules
+		->configure($ar_bootstrap_configs)
+		// Load the Site
+		->load_site();
 
 echo AR::site('errors.error_reporting');
-
-
-		// Load the site
-	//	->load_site()
-	//	// Wrap the normal Request instance
-	//	->init_request();
 
 //var_export(AR::instance());
 echo 'THE END';
