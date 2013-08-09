@@ -1,4 +1,4 @@
-<?php
+<?php defined('AR_VERSION') or die('No direct script access.');
 /**
  * Hostname library.
  *

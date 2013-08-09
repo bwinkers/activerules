@@ -1,6 +1,9 @@
-<?php
+<?php defined('AR_VERSION') or die('No direct script access.');
 /**
  * AR (ActiveRules) library.
+ * This gets loaded as a singleton for all request.
+ * It loads a site config and performs the core ActiveRules bootstrapping.
+ * 
  *
  * @package    ActiveRules
  * @author     Brian Winkers
@@ -69,7 +72,7 @@ class Activerules_AR {
 	/**
 	 * @var Site object
 	 */
-	public static $site = NULL;
+	public static $_site = NULL;
 
 	/**
 	 * @var  boolean  Has init been called?
@@ -100,35 +103,61 @@ class Activerules_AR {
 	protected static $_cacher = NULL;
 	protected static $_logger = NULL;
 	
-	public function __construct($config_array)
+	private static $instance;
+	
+	private function __construct()
 	{
+		/* PRIVATE */
 		// Enable Activerules exception handling, adds stack traces and error source.
-		set_exception_handler(array('Activerules_Exception', 'handler'));
+		//set_exception_handler(array('Activerules_Exception', 'handler'));
 
 		// Enable Activerules error handling, converts all PHP errors to exceptions.
-		set_error_handler(array('AR', 'error_handler'));
-
+		//set_error_handler(array('AR', 'error_handler'));
 
 		// Enable the Activerules shutdown handler, which catches E_FATAL errors.
-		register_shutdown_function(array('AR', 'shutdown_handler'));
+		//register_shutdown_function(array('AR', 'shutdown_handler'));
 		
+	}
+	
+	public static function instance()
+	{
+		if (!isset(self::$instance)) 
+		{
+            $class_name = __CLASS__;
+            self::$instance = new $class_name;
+        }
+		
+        return self::$instance;
+	}
+	
+	public static function configure($config_array=NULL)
+	{
 		// Set the AR storage if defined
 		if(isset($config_array['config_storage']))
 		{
-			$this->set_storage($config_array['config_storage']);
+			self::set_storage($config_array['config_storage']);
 		}
 
 		// Set the AR cacher if defined
 		if(isset($config_array['cacher']))
 		{
-			$this->set_cacher($config_array['cacher']);
+			self::set_cacher($config_array['cacher']);
 		}
 
 		// Set the AR logger if defined
 		if(isset($config_array['logger']))
 		{
-			$this->set_logger($config_array['logger']);
+			self::set_logger($config_array['logger']);
 		}
+		
+		return self::$instance;
+	}
+	
+	public static function site($dot_config=NULL, $default=NULL)
+	{
+		echo '<pre>';
+		var_export(self::$_site->config($dot_config, $default));
+// return AR::$_site->config($dot_config, $default);
 	}
 	
 	/**
@@ -142,24 +171,12 @@ class Activerules_AR {
 			 * Create the Site class.
 			 * If we passed in a site name it would load that site.
 			 */
-			$site = new Site();
-
-			/** 
-			 * Pass the ActiveRules config object onto the site storage class.
-			 * This is the primary purpose of defining the AR storage.
-			 * It allows us to look up basic site configuration.
-			 */
-			$site->set_storage(self::$_storage);
-
-			/**
-			 * Load the site
-			 */
-			$site->init_site();
+			$site = Site::factory()->set_storage(self::$_storage)->init_site();
 
 			/**
 			 * Set the sites error_reporting
 			 */
-			error_reporting(Site::config('errors.error_reportings', 0));
+			//error_reporting($site->config('errors.error_reporting', 0));
 
 			/**
 			 * Load the modules from the Site host config
@@ -176,24 +193,29 @@ class Activerules_AR {
 				}
 			}
 
-			// Create a new Request object now that all the modules are loaded
-			// This sanitizes and stores all environment/request data.
-			// This should be the primary for all processing past this point to look for that data.
-			// very little should be read form the native super globals after this.
-			$request = new Request;
-
 			// Bootstrap the modules
 			// We wait until all modules are loaded to reduce issues with load order dependencies.
-			$this->_bootstrap_modules();
-			
-			$router = new Router(Site::config('routes'));
-			
-			$router->route_request($request);
+			self::_bootstrap_modules();
+	
+			self::$_site = $site;
+
 		}
 		catch ( Exception $e)
 		{
 			var_export($e);
 		}
+		
+		return self::$instance;
+	}
+	
+	/**
+	 * Start the ActiveRules processing
+	 */
+	public function init_request()
+	{
+		//	var_export(AR::$_site); exit;
+		
+		return $this;
 	}
 	
 	public static function add_module($module)
@@ -221,7 +243,7 @@ class Activerules_AR {
 	/**
 	 * Set the storage method used for site configs
 	 */
-	public function set_storage($storage)
+	public static function set_storage($storage)
 	{
 		switch($storage)
 		{
@@ -239,7 +261,7 @@ class Activerules_AR {
 	/**
 	 * Set the cache method used for site configs
 	 */
-	public function cacher($cacher)
+	public static  function cacher($cacher)
 	{
 		switch($cacher)
 		{
@@ -252,7 +274,7 @@ class Activerules_AR {
 	/**
 	 * Set the logger method used for site configs
 	 */
-	public function logger($logger)
+	public static function logger($logger)
 	{
 		switch($logger)
 		{

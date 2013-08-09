@@ -4,6 +4,12 @@
  */
 
 /**
+ * Start output buffering
+ * This is done here to catch output at this level.
+ */
+ob_start();
+
+/**
  * Define the start time of the application, used for profiling.
  */
 if ( ! defined('AR_START_TIME'))
@@ -78,15 +84,47 @@ $ar_bootstrap_configs = array(
 
 /**
  * Create a new AR class instance
+ * 
+ *	1. Load the Site class.
+ *     This class provides site specfifc base level configuration of modules and services
+ * 
+ *  2. Load the Request class. 
+ *     This should encapsulate all of the global variables
+ *     The class loaded to handle this will be controlled by the order the modules are loaded.
+ *     If no Request class is found in a module the Activerules Request class will be used.
+ * 
+ *  3. Route the Request. 
+ *     The Route class will determine how to route the request.
+ *     The class loaded to handle this will be controlled by the order the modules are loaded.
+ *     If no Route class is found in a module the Activerules Route class will be used.
+ * 
+ *  4. Service the Request
+ *     This class will service the Request and provide a Response
+ * 
+ *  5. Send the Response
+ *     This sends the response to the client.
+ *     This could respond with mock data in certain circumstances.
+ * 
+ * Ideally it should send the whole response
+ * But it needs to provide core services to various sub levels
+ *     
  */
-$ar = new AR($ar_bootstrap_configs);
+$ar = AR::instance()->configure($ar_bootstrap_configs)->load_site();
 
+
+echo AR::site('errors.error_reporting');
+
+
+		// Load the site
+	//	->load_site()
+	//	// Wrap the normal Request instance
+	//	->init_request();
+
+//var_export(AR::instance());
+echo 'THE END';
 /**
- * Load the site.
- * The site will handle the request after that.
+ * Flush the bufer to get rid of any screen output at this level
  */
-$ar->load_site();
-
-echo '<br>Finished in index.php'
+//ob_end_clean() 
 
 ?>
