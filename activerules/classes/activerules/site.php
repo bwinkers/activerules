@@ -6,19 +6,19 @@
  * @author     Brian Winkers
  * @copyright  (c) 2005-2013 Brian Winkers
  */
-class Activerules_Site {
-	
-	/**
-	 * This is used for site specfic directories etc.
-	 * @var string The site alias 
-	 */
-	private $_site_alias;
+class Activerules_Site implements Interface_Site {
 	
 	/**
 	 * Information about the requested, configured and supported hostname.
 	 * @var object Hostname object
 	 */
 	private $_hostname;
+	
+	/**
+	 * This is used for site specfic directories etc.
+	 * @var string The site alias 
+	 */
+	private $_site_alias;
 	
 	/**
 	 * Location where site specific
@@ -30,8 +30,7 @@ class Activerules_Site {
 	 * Config populated from storage or cache
 	 */
 	private $_config;
-	
-	
+
 	/**
 	 * Return a site object.
 	 * 
@@ -46,36 +45,15 @@ class Activerules_Site {
 	}
 	
 	/**
-	 * Load the site
-	 */
-	private function __construct($site_alias=NULL)
-	{
-		if($site_alias)
-		{
-			$this->$_site_alias = $site_alias;
-		}
-	}
-	
-	/**
-	 * Determine the site host based on all available data
-	 */
-	public function determine_host()
-	{
-		$hostname = self::check_hostname();
-
-		// Store the hostname data in the site
-		$this->_hostname = $hostname;
-	}
-	
-	/**
+	 * Initialize the site.
+	 * Return the Site object for method chaining.
 	 *
-	 * @param type $site_alias
-	 * @return type 
+	 * @return $this 
 	 */
 	public function init_site()
 	{
 		// Determine the hostname
-		$this->determine_host();
+		$this->_determine_host();
 		
 		// get the site alias from the hostname
 		$site_alias = $this->_hostname->get_site_alias();
@@ -95,6 +73,30 @@ class Activerules_Site {
 	}
 	
 	/**
+	 * Load the site
+	 */
+	private function __construct($site_alias=NULL)
+	{
+		if($site_alias)
+		{
+			$this->$_site_alias = $site_alias;
+		}
+	}
+	
+	/**
+	 * Determine the site host based on all available data
+	 */
+	private function _determine_host()
+	{
+		$hostname = $this->_valid_hostname();
+
+		// Store the hostname data in the site
+		$this->_hostname = $hostname;
+	}
+	
+	
+	
+	/**
 	 * get the modules used by this site
 	 * @return type 
 	 */
@@ -109,37 +111,29 @@ class Activerules_Site {
 	}
 	
 	/**
-	 * Get the site alias for this site.
-	 * This is used for directpry names and such.
-	 * 
-	 * @param type $site_alias 
-	 */
-	public function set_site_alias($site_alias)
-	{
-		$this->_site_alias = $site_alias;
-	}
-	
-	/**
-	 * Process the hostname to deteermine a site.
+	 * Check if the hostname is supported.
+	 * If it does exist return a Hostname object.
 	 * 
 	 * @return Hostname object
 	 */
-	public function check_hostname()
+	private function _valid_hostname()
 	{
 		// To determine the site we need to get a supported hostname object
 		$hostname = new Hostname();
-		
+	
 		// Pass the storage object to the hostname object
 		$hostname->set_storage($this->_storage);
 
 		// Process the hostname
 		$hostname->process();
-	
+
+		// Hostname obejcts returns FALSE if its unsupported.
 		return $hostname;
 	}
 
 	/**
-	 * Set the storage method used for site configs
+	 * Set the storage method used for site configs.
+	 * This is not in the Interface becasue it isn't intrinsic tot he functionality of a site.
 	 */
 	public function set_storage($storage)
 	{

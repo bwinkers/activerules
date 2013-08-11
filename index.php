@@ -118,7 +118,7 @@ $ar = AR::instance()
 echo AR::site('errors.error_reporting');
 
 //var_export(AR::instance());
-echo 'THE END';
+echo 'THE END is near';
 /**
  * Flush the bufer to get rid of any screen output at this level
  */

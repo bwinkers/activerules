@@ -9,21 +9,42 @@
 class Activerules_Hostname implements Interface_Hostname {
 	
 	/**
-	 * This is used for hostname specfic directories etc.
-	 * @var string The hostname alias 
-	 */
+	 * This is the first hostname recieved.
+	 * Prcoessing may trim it or redirect it.
+	 */	
 	private $_original_hostname;
-	
+		
+	/**
+	 * This is used for hostname specfic directories etc.
+	 * This is the hostname that refers back to this host
+	 */	
 	private $_supported_hostname = FALSE;
 	
+	/**
+	 * This is the hostname a configuration was found for.
+	 * It may be lower than the original or supported hostanme, but never higher.
+	 */		
 	private $_configured_hostname = FALSE;
 	
+	/**
+	 * This is the type of storage to use for looking up hostanme data.
+	 */	
 	private $_storage = 'file';
 	
+	/**
+	 * This is used for hostname specfic directories etc.
+	 */
 	private $_site_alias;
 	
+	/**
+	 * This is the host data array.
+	 * It will override any site level data.
+	 */
 	private $_host_data;
-	
+
+	/**
+	 * This defines the number of sub domain levls supported 
+	 */
 	private $_subdomain_levels = FALSE;
 	
 	/**

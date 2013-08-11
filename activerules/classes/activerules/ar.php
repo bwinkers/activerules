@@ -110,6 +110,11 @@ class Activerules_AR {
 		/* PRIVATE */
 	}
 	
+	/**
+	 * Create a singleton instance of the AR class
+	 * 
+	 * @return object Self reference
+	 */
 	public static function instance()
 	{
 		if (!isset(self::$instance)) 
@@ -118,10 +123,34 @@ class Activerules_AR {
             self::$instance = new $class_name;
         }
 		
+		/**
+		 * Return an the current object for chaining
+		 */
         return self::$instance;
 	}
 	
-	public static function configure($config_array=NULL)
+	/**
+	 * Add a module path
+	 * This is used by the cascading file system used for autolaoding classes.
+	 * 
+	 * @param string Module path
+	 */
+	public static function add_module($module)
+	{
+		if(is_dir($module))
+		{  		
+			self::$_modules[] = $module;
+		}
+	}
+	
+	/**
+	 * Configure the base services for ActiveRules site boot process.
+	 * Return itself for method chaining.
+	 * 
+	 * @param type $config_array
+	 * @return object Self reference
+	 */
+	public function configure($config_array=NULL)
 	{
 		// Set the AR storage if defined
 		if(isset($config_array['config_storage']))
@@ -141,16 +170,17 @@ class Activerules_AR {
 			self::set_logger($config_array['logger']);
 		}
 		
+		/**
+		 * Return an the current object for chaining
+		 */
 		return self::$instance;
 	}
 	
-	public static function site($dot_config=NULL, $default=NULL)
-	{
-		return self::$_site->config($dot_config, $default);
-	}
 	
 	/**
 	 * Start the ActiveRules processing
+	 * 
+	 * @return object Self reference
 	 */
 	public function load_site()
 	{
@@ -186,15 +216,10 @@ class Activerules_AR {
 			// We wait until all modules are loaded to reduce issues with load order dependencies.
 			self::_bootstrap_modules();
 			
-			// Enable Activerules exception handling, adds stack traces and error source.
-			//set_exception_handler(array('Activerules_Exception', 'handler'));
-
-			// Enable Activerules error handling, converts all PHP errors to exceptions.
-			//set_error_handler(array('AR', 'error_handler'));
-
-			// Enable the Activerules shutdown handler, which catches E_FATAL errors.
-			//register_shutdown_function(array('AR', 'shutdown_handler'));
-	
+			/**
+			 * Store the Site object witihn the AR singleton
+			 * The Site object also has the Hostname object avilable to it.
+			 */
 			self::$_site = $site;
 
 		}
@@ -203,39 +228,23 @@ class Activerules_AR {
 			var_export($e);
 		}
 		
+		/**
+		 * Return an the current object for chaining
+		 */
 		return self::$instance;
 	}
 	
 	/**
-	 * Start the ActiveRules processing
+	 * Return results from the Site config data.
+	 * 
+	 * @param type $dot_config
+	 * @param type $default
+	 * @return type 
 	 */
-	public function init_request()
+	public static function site($dot_config=NULL, $default=NULL)
 	{
-		//	var_export(AR::$_site); exit;
-		
-		return $this;
-	}
-	
-	public static function add_module($module)
-	{
-		if(is_dir($module))
-		{  		
-			self::$_modules[] = $module;
-		}
-	}
-	
-	private function _bootstrap_modules()
-	{
-		foreach(self::$_modules AS $module)
-		{
-			// Check to see if there is an ini file for the module
-			$module_bootstrap = $module.DIRECTORY_SEPARATOR.'bootstrap'.EXT;
-
-			if(is_file($module_bootstrap))
-			{
-				require_once($module_bootstrap);
-			}
-		}
+		// The Site config method should perform ALL logic about what to return
+		return self::$_site->config($dot_config, $default);
 	}
 	
 	/**
@@ -252,32 +261,6 @@ class Activerules_AR {
 				
 			default:
 				echo $storage;
-				break;
-		}
-	}
-	
-	/**
-	 * Set the cache method used for site configs
-	 */
-	public static  function cacher($cacher)
-	{
-		switch($cacher)
-		{
-			default:
-				echo $cacher;
-				break;
-		}
-	}
-	
-	/**
-	 * Set the logger method used for site configs
-	 */
-	public static function logger($logger)
-	{
-		switch($logger)
-		{
-			default:
-				echo $logger;
 				break;
 		}
 	}
@@ -525,6 +508,32 @@ class Activerules_AR {
 		//ob_end_clean();
 		exit(1);
 		
+	}
+	
+	
+	/**
+	 * Loop through the modules and run their bootstratp files.
+	 */
+	private function _bootstrap_modules()
+	{
+		foreach(self::$_modules AS $module)
+		{
+			self::_bootstrap_module($module);
+		}
+	}
+	
+	/**
+	 * Loop through the modules and run their bootstratp files.
+	 */
+	private function _bootstrap_module($module)
+	{
+		// Check to see if there is an ini file for the module
+		$module_bootstrap = $module.DIRECTORY_SEPARATOR.'bootstrap'.EXT;
+
+		if(is_file($module_bootstrap))
+		{
+			require_once($module_bootstrap);
+		}
 	}
 
 
