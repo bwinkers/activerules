@@ -1,52 +1,76 @@
 <?php defined('AR_VERSION') or die('No direct script access.');
 /**
- * Hostname library.
+ * Core ActiveRules Hostname library.
  *
  * @package    ActiveRules
  * @author     Brian Winkers
  * @copyright  (c) 2005-2013 Brian Winkers
  */
-class Activerules_Hostname {
+class Activerules_Hostname implements Interface_Hostname {
 	
 	/**
 	 * This is used for hostname specfic directories etc.
 	 * @var string The hostname alias 
 	 */
-	private static $_requested_hostname;
+	private $_original_hostname;
 	
-	private static $_supported_hostname = FALSE;
+	private $_supported_hostname = FALSE;
 	
-	private static $_configured_hostname = FALSE;
+	private $_configured_hostname = FALSE;
 	
-	private static $_storage = 'file';
+	private $_storage = 'file';
 	
-	private static $_site_alias;
+	private $_site_alias;
 	
-	private static $_host_data;
+	private $_host_data;
 	
-	private static $_subdomain_levels = FALSE;
-	
+	private $_subdomain_levels = FALSE;
 	
 	/**
-	 * $hostname string Hostname to start from or HTTP_HOST
+	 * Return supported hostname.
+	 * Activerules supports dynamic domain structures.
+	 * It is name used for the services at the hostname to refer itself.
+	 * This is NOT the canonical hostname.
 	 */
-	public function __construct($hostname=NULL)
+	public function get_supported()
 	{
-		if($hostname===NULL)
-		{
-			$hostname = $_SERVER['HTTP_HOST'];
-		}
-
-		self::$_requested_hostname = $hostname;
+		return $this->_supported_hostname;
 	}
 	
 	/**
-	 * Determine the base supported domain.
-	 * Activerules supports dynamic domain structures.
+	 * Return the hostname that a config file was found for.
+	 * For dynamic domain hostingthe domain name used for configuration may not match the "supported hostname".
 	 */
-	public static function supported()
+	public function get_configured()
 	{
-		return self::$_found_hostname;
+		return $this->_configured_hostname;
+	}
+	
+	/**
+	 * Return the hostname that a config file was found for.
+	 * For dynamic domain hostingthe domain name used for configuration may not match the "supported hostname".
+	 */
+	public function get_original()
+	{
+		return $this->_original_hostname;
+	}
+	
+	/**
+	 * Return the site alias associated with this hostname.
+	 * Associating hostnames and sites is a core ActiveRules service.
+	 */
+	public function get_site_alias()
+	{
+		return $this->_site_alias;
+	}
+	
+	/**
+	 * Provides a config array for the host.
+	 * ActiveRules allows host level data to override site level data.
+	 */
+	public function get_host_data()
+	{
+		return $this->_host_data;
 	}
 	
 	/**
@@ -55,34 +79,34 @@ class Activerules_Hostname {
 	 * @param object $hostname  Hostname object
 	 * @return 
 	 */
-	public static function process($hostname=NULL)
+	public function process($hostname=NULL)
 	{
 		if($hostname===NULL)
 		{
-			$hostname = self::$_requested_hostname;
+			$hostname = $this->_requested_hostname;
 		}
 
 		// check if the host is configured
-		$host_check = self::configured_hostname($hostname);
+		$host_check = $this->_configured_hostname($hostname);
 
 		if($host_check)
 		{
 			// Set the hostname that was found
-			self::$_configured_hostname = $host_check['hostname'];
+			$this->_configured_hostname = $host_check['hostname'];
 			
 			// At minimum we need a site defined
-			self::$_site_alias = $host_check['data']['site_alias'];
+			$this->_site_alias = $host_check['data']['site_alias'];
 			
 			// We remove the site_alias and set the rest of the host data in the object
 			unset($host_check['data']['site_alias']);
-			self::$_host_data = $host_check['data'];
+			$this->_host_data = $host_check['data'];
 			
 			// We also check to see if the host supports subhosts
 			// and if subhosts are supported how many levels are supported
 			if(isset($host_check['data']['subdomain_levels']))
 			{
 				// trim the subdomains to the maximum level
-				$remainder = trim(rtrim(self::$_requested_hostname, self::$_configured_hostname), '.');
+				$remainder = trim(rtrim($this->_requested_hostname, $this->_configured_hostname), '.');
 				
 				// Create an arry on the remaining dot separated parts
 				$remaining_parts = explode('.', $remainder);
@@ -94,14 +118,14 @@ class Activerules_Hostname {
 				$valid_parts = array_slice($remaining_parts, $num);
 				
 				// Assemble the longest supported domain name from the requested hostname
-				self::$_supported_hostname = implode('.', $valid_parts).'.'.self::$_configured_hostname;
+				$this->_supported_hostname = implode('.', $valid_parts).'.'.$this->_configured_hostname;
 			}
 			
 			// We then check to see if the host defines any redirections
 			// and if subhosts are supported how many levels are supported
 			if(isset($host_check['data']['redirect']))
 			{
-				self::redirect_host($host_check['data']['redirect']);
+				$this->_redirect_host($host_check['data']['redirect']);
 			}
 		}
 		else
@@ -110,17 +134,48 @@ class Activerules_Hostname {
 		}
 	}
 	
-	public static function redirect_host($redirect_config_array)
+	/**
+	 * $hostname string Hostname to start from or HTTP_HOST
+	 */
+	public function __construct($hostname=NULL)
+	{
+		if($hostname===NULL)
+		{
+			$hostname = $_SERVER['HTTP_HOST'];
+		}
+
+		$this->_requested_hostname = $hostname;
+	}
+	
+	/**
+	 * Set the storage method used for hostname configs.
+	 * This method is public because the Site class needs to use it to pass in a storage object.
+	 * 
+	 * @param object Storage object 
+	 */
+	public function set_storage($storage)
+	{
+		$this->_storage = $storage;
+	}
+	
+	/**
+	 * This provides redirects in a very basic way for handling host level redirects.
+	 * It is private because other modules should NOT try to use this.
+	 * 
+	 * @param type $redirect_config_array
+	 * @return type 
+	 */
+	private function _redirect_host($redirect_config_array)
 	{
 		// get the final URL
 		switch($redirect_config_array['target'])
 		{
 			case 'supported_hostname':
-				$redirect_target = self::$_supported_hostname;
+				$redirect_target = $this->_supported_hostname;
 				break;
 
 			case 'configured_hostname':
-				$redirect_target = self::$_configured_hostname;
+				$redirect_target = $this->_configured_hostname;
 				break;
 
 			default:
@@ -173,14 +228,15 @@ class Activerules_Hostname {
 	
 	/**
 	 * Determines if there is a valid config for this hostname.
+	 * This method is private becasue nothing should care HOW Hostname goes about its business.
 	 */
-	public static function configured_hostname($hostname)
+	private function _configured_hostname($hostname)
 	{
 		// If the host is valid there will be a config group with that name
 
 		// Load the config.
 		// This will return a hostname config array or FALSE
-		$host_data = self::$_storage->load_group('host'.DIRECTORY_SEPARATOR.$hostname);
+		$host_data = $this->_storage->load_group('host'.DIRECTORY_SEPARATOR.$hostname);
 
 		if($host_data)
 		{
@@ -198,7 +254,7 @@ class Activerules_Hostname {
 				// Strip off the first part of the domain and check that domain
 				$next_hostname = substr($hostname, $dot_location+1);
 
-				return self::configured_hostname($next_hostname);
+				return $this->_configured_hostname($next_hostname);
 			}
 		}
 		
@@ -206,42 +262,9 @@ class Activerules_Hostname {
 	}
 	
 	
-	/**
-	 * Set the storage method used for hostname configs
-	 */
-	public static function set_storage($storage)
-	{
-		self::$_storage = $storage;
-	}
-	
-	public static function get_requested_hostname()
-	{
-		return self::$_requested_hostname;
-	}
-	
-	public static function get_configured_hostname()
-	{
-		return self::$_configured_hostname;
-	}
-	
-	public static function get_supported_hostname()
-	{
-		return self::$_supported_hostname;
-	}
-	
-	public static function get_site_alias()
-	{
-		return self::$_site_alias;
-	}
-	
-	public static function get_host_data()
-	{
-		return self::$_host_data;
-	}
-	
 	public function __toString()
 	{
-		return  self::$_supported_hostname;
+		return  $this->_supported_hostname;
 	}
 	
-} // End Hostname Class
+} // End Activerules_Hostname Class
