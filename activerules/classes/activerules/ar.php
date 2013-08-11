@@ -135,12 +135,25 @@ class Activerules_AR {
 	 * 
 	 * @param string Module path
 	 */
-	public static function add_module($module)
+	public static function add_module($module, $end=TRUE)
 	{
+		// if the module isn't a directory don;t bother adding it.
 		if(is_dir($module))
 		{  		
-			self::$_modules[] = $module;
+			if($end)
+			{
+				self::$_modules[] = $module;
+				return TRUE;
+			}
+			else
+			{
+				array_unshift(self::$_modules, $module);
+				return TRUE;
+			}
 		}
+		
+		// The module was not able to be added
+		return FALSE;
 	}
 	
 	/**
@@ -505,12 +518,11 @@ class Activerules_AR {
 	 */
 	public static function shutdown_handler()
 	{
-		//ob_end_clean();
+		ob_end_clean();
 		exit(1);
 		
 	}
-	
-	
+		
 	/**
 	 * Loop through the modules and run their bootstratp files.
 	 */
@@ -535,7 +547,5 @@ class Activerules_AR {
 			require_once($module_bootstrap);
 		}
 	}
-
-
 	
 } // End AR(ActiveRules) Class
