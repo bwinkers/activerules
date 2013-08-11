@@ -115,8 +115,6 @@ $ar = AR::instance()
 		// Load the Site
 		->load_site();
 
-echo AR::site('errors.error_reporting');
-
 /**
  * Flush the bufer to get rid of any screen output at this level
  */
