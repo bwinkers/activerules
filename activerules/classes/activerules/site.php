@@ -73,30 +73,6 @@ class Activerules_Site implements Interface_Site {
 	}
 	
 	/**
-	 * Load the site
-	 */
-	private function __construct($site_alias=NULL)
-	{
-		if($site_alias)
-		{
-			$this->$_site_alias = $site_alias;
-		}
-	}
-	
-	/**
-	 * Determine the site host based on all available data
-	 */
-	private function _determine_host()
-	{
-		$hostname = $this->_valid_hostname();
-
-		// Store the hostname data in the site
-		$this->_hostname = $hostname;
-	}
-	
-	
-	
-	/**
 	 * get the modules used by this site
 	 * @return type 
 	 */
@@ -110,27 +86,6 @@ class Activerules_Site implements Interface_Site {
 		return FALSE;
 	}
 	
-	/**
-	 * Check if the hostname is supported.
-	 * If it does exist return a Hostname object.
-	 * 
-	 * @return Hostname object
-	 */
-	private function _valid_hostname()
-	{
-		// To determine the site we need to get a supported hostname object
-		$hostname = new Hostname();
-	
-		// Pass the storage object to the hostname object
-		$hostname->set_storage($this->_storage);
-
-		// Process the hostname
-		$hostname->process();
-
-		// Hostname obejcts returns FALSE if its unsupported.
-		return $hostname;
-	}
-
 	/**
 	 * Set the storage method used for site configs.
 	 * This is not in the Interface becasue it isn't intrinsic tot he functionality of a site.
@@ -177,6 +132,49 @@ class Activerules_Site implements Interface_Site {
 
 			return $config;
 		}
+	}
+	
+	/**
+	 * Load the site
+	 */
+	private function __construct($site_alias=NULL)
+	{
+		if($site_alias)
+		{
+			$this->$_site_alias = $site_alias;
+		}
+	}
+	
+	/**
+	 * Determine the site host based on all available data
+	 */
+	private function _determine_host()
+	{
+		$hostname = $this->_valid_hostname();
+
+		// Store the hostname data in the site
+		$this->_hostname = $hostname;
+	}
+	
+	/**
+	 * Check if the hostname is supported.
+	 * If it does exist return a Hostname object.
+	 * 
+	 * @return Hostname object
+	 */
+	private function _valid_hostname()
+	{
+		// To determine the site we need to get a supported hostname object
+		$hostname = new Hostname();
+	
+		// Pass the storage object to the hostname object
+		$hostname->set_storage($this->_storage);
+
+		// Process the hostname
+		$hostname->process('test','multi', array('my'=>'test','is'=>'done'));
+
+		// Hostname obejcts returns FALSE if its unsupported.
+		return $hostname;
 	}
 
 } // End Site Class

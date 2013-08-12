@@ -17,15 +17,10 @@ class Activerules_Exception extends Exception {
 		E_NOTICE             => 'Notice',
 		E_RECOVERABLE_ERROR  => 'Recoverable Error',
 	);
-
-	/**
-	 * @var  string  error rendering view
-	 */
-	public static $error_view = 'activerules/error';
-
-	/**
-	 * @var  string  error view content type
-	 */
+	
+   /**
+	* @var  string  error view content type
+	*/
 	public static $error_view_content_type = 'text/html';
 
 	/**
@@ -39,7 +34,7 @@ class Activerules_Exception extends Exception {
 	 * @param   integer|string  the exception code
 	 * @return  void
 	 */
-	public function __construct($message, array $variables = NULL, $code = 0)
+	public function __construct($message, array $variables = array(), $code = 0)
 	{
 		if (defined('E_DEPRECATED'))
 		{
@@ -48,7 +43,7 @@ class Activerules_Exception extends Exception {
 		}
 
 		// Set the message
-		//$message = __($message, $variables);
+		$message = strtr($message, $variables);
 
 		// Pass the message and integer code to the parent
 		parent::__construct($message, (int) $code);
@@ -89,7 +84,7 @@ class Activerules_Exception extends Exception {
 			$message = $e->getMessage();
 			$file    = $e->getFile();
 			$line    = $e->getLine();
-
+			
 			// Get the exception backtrace
 			$trace = $e->getTrace();
 
@@ -99,23 +94,6 @@ class Activerules_Exception extends Exception {
 				{
 					// Use the human-readable error name
 					$code = Activerules_Exception::$php_errors[$code];
-				}
-
-				if (version_compare(PHP_VERSION, '5.3', '<'))
-				{
-					// Workaround for a bug in ErrorException::getTrace() that exists in
-					// all PHP 5.2 versions. @see http://bugs.php.net/bug.php?id=45895
-					for ($i = count($trace) - 1; $i > 0; --$i)
-					{
-						if (isset($trace[$i - 1]['args']))
-						{
-							// Re-position the args
-							$trace[$i]['args'] = $trace[$i - 1]['args'];
-
-							// Remove the args
-							unset($trace[$i - 1]['args']);
-						}
-					}
 				}
 			}
 
@@ -130,29 +108,34 @@ class Activerules_Exception extends Exception {
 				header('Content-Type: '.Activerules_Exception::$error_view_content_type.'; charset='.AR::$charset, TRUE, $http_header_status);
 			}
 
-		//	if (Request::$current !== NULL AND Request::current()->is_ajax() === TRUE)
-		//	{
-				// Just display the text of the exception
-		//		echo "\n{$error}\n";
-
-		//		exit(1);
-		//	}
-
 			// Start an output buffer
 			ob_start();
 
-			// Include the exception HTML
-			if ($view_file = AR::find_file('views', Activerules_Exception::$error_view))
+			echo $error;
+			echo '<pre>';
+			foreach($trace as $stack)
 			{
-				include $view_file;
+				echo "\n".Dbg::path($stack['file']).' ['.$stack['line'].']';
+				echo "\n".$stack['class'].'::'.$stack['function'];
+				echo "\n";
+				foreach($stack['args'] as $arg)
+				{
+					switch(gettype($arg))
+					{
+						case 'string':
+							echo $arg;
+							break;
+						
+						case 'object':
+						case 'array':
+							var_export($arg);
+							break;
+					}
+					echo "\n";
+				}
 			}
-			else
-			{
-				throw new Activerules_Exception('Error view file does not exist: views/:file', array(
-					':file' => Activerules_Exception::$error_view,
-				));
-			}
-
+			echo "\n";
+			
 			// Display the contents of the output buffer
 			echo ob_get_clean();
 
@@ -181,8 +164,8 @@ class Activerules_Exception extends Exception {
 	 */
 	public static function text(Exception $e)
 	{
-		//return sprintf('%s [ %s ]: %s ~ %s [ %d ]',
-		//	get_class($e), $e->getCode(), strip_tags($e->getMessage()), Dbg::path($e->getFile()), $e->getLine());
+		return sprintf('%s [ %s ]: %s ~ %s [ %d ]',
+		get_class($e), $e->getCode(), strip_tags($e->getMessage()), Dbg::path($e->getFile()), $e->getLine());
 	}
 
 } // End Activerules_Exception

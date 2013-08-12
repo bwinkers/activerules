@@ -108,6 +108,15 @@ class Activerules_AR {
 	private function __construct()
 	{
 		/* PRIVATE */
+		// Enable ActiveRules exception handling, adds stack traces and error source.
+		set_exception_handler(array('Activerules_Exception', 'handler'));
+
+		// Enable ActiveRulesa error handling, converts all PHP errors to exceptions.
+		//set_error_handler(array('AR', 'error_handler'));
+
+		// Enable the ActiveRules shutdown handler, which catches E_FATAL errors.
+		//register_shutdown_function(array('Activerules_AR', 'shutdown_handler'));
+
 	}
 	
 	/**
@@ -236,7 +245,7 @@ class Activerules_AR {
 			self::$_site = $site;
 
 		}
-		catch ( Exception $e)
+		catch ( Activerules_Exception $e)
 		{
 			var_export($e);
 		}
@@ -287,9 +296,9 @@ class Activerules_AR {
 	 * You should never have to call this function, as simply calling a class
 	 * will cause it to be called.
 	 *
-	 * This function must be enabled as an autoloader in the bootstrap:
+	 * This function must be enabled as an autoloader in the index file:
 	 *
-	 *     spl_autoload_register(array('AR', 'autoload'));
+	 *     spl_autoload_register(array('Activerules_AR', 'autoload'));
 	 *
 	 * @param   string   class name
 	 * @return  boolean
@@ -315,7 +324,7 @@ class Activerules_AR {
 			// Class is not in the filesystem
 			return FALSE;
 		}
-		catch (Exception $e)
+		catch (Activerules_Exception $e)
 		{
 			Activerules_Exception::handler($e);
 			die;
