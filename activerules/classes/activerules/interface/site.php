@@ -1,7 +1,8 @@
 <?php defined('AR_VERSION') or die('No direct script access.');
 /**
  * ActiveRules Site interface
- * This defines the core functionality the Site class needs to provide
+ * This defines the core functionality the readable Site class needs to provide.
+ * This interfaces does NOT support updating the Site object or telling it anything.
  *
  * @package    ActiveRules
  * @author     Brian Winkers
@@ -12,13 +13,18 @@ interface Activerules_Interface_Site {
 	/**
 	 * The site interface must provide a factory interface
 	 */
-	public static function factory();
+	public static function factory($storage=NULL);
+	
+	/**
+	 * The site interface must provide a factory interface
+	 */
+	public function site_alias();
 
 	/**
-	 * Initialize the site.
-	 * Load the site data.
+	 * Return a config variable for a site.
+	 * This should take a dot notated array path and return the configured value.
 	 */
-	public function init_site();
+	public function config($dot_path, $default=FALSE);
 	
 }
 	

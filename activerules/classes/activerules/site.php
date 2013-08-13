@@ -33,13 +33,31 @@ class Activerules_Site implements Interface_Site {
 
 	/**
 	 * Return a site object.
+	 * We don't do too much 
 	 * 
 	 * @param string $site_alias
 	 * @return Site object
 	 */
-	public static function factory($site_alias=NULL)
+	public static function factory($storage=NULL)
 	{
-		$site = new Site($site_alias);
+		$site = new Site($storage);
+		
+		// Determine the hostname.
+		$site->_determine_host();
+
+		// get the Site alias from the Hostname
+		$site_alias = $site->hostname->get_site_alias();
+
+		// This will return a hostname config array or FALSE
+		$site_data = $site_storage->load_groups('site'.DIRECTORY_SEPARATOR.$site_alias);
+
+		if($site_data)
+		{
+			// merge host data and site data
+			$merged_configs = array_merge_recursive($site->hostname->get_host_data(), $site_data);
+			
+			$site->_config = $merged_configs;
+		}
 		
 		return $site;		
 	}
@@ -50,7 +68,7 @@ class Activerules_Site implements Interface_Site {
 	 *
 	 * @return $this 
 	 */
-	public function init_site()
+	private function _init_site()
 	{
 		// Determine the hostname.
 		$this->_determine_host();
@@ -137,16 +155,14 @@ class Activerules_Site implements Interface_Site {
 	/**
 	 * Load the site
 	 */
-	private function __construct($site_alias=NULL)
+	private function __construct($storage=NULL)
 	{
-		if($site_alias)
-		{
-			$this->$_site_alias = $site_alias;
-		}
+		$this->_storage = $storage;
 	}
 	
 	/**
-	 * Determine the site host based on all available data
+	 * This stes the private variable hostname object.
+	 * It calls the Hostname object without a hostname so the default HTPP_HOST is used within the Hostname object.
 	 */
 	private function _determine_host()
 	{
@@ -158,7 +174,8 @@ class Activerules_Site implements Interface_Site {
 	
 	/**
 	 * Check if the hostname is supported.
-	 * If it does exist return a Hostname objects
+	 * If it does exist return a Hostname objects.
+	 * This could be called multiple time as it doesn't set any variable.
 	 * 
 	 * @return Hostname object
 	 */
@@ -175,6 +192,14 @@ class Activerules_Site implements Interface_Site {
 
 		// Hostname obejcts returns FALSE if its unsupported.
 		return $hostname;
+	}
+	
+	/**
+	 * Return the Site Alias.
+	 */
+	public function site_alias()
+	{
+		return $this->_site_alias;
 	}
 
 } // End Site Class

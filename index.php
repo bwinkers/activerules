@@ -69,10 +69,10 @@ require_once(ACTIVEPATH.'classes'.DIRECTORY_SEPARATOR.'activerules'.DIRECTORY_SE
 spl_autoload_register(array('Activerules_AR', 'autoload'));
 
 // Enable ActiveRules exception handling, adds stack traces and error source.
-//set_exception_handler(array('Activerules_Exception', 'handler'));
+set_exception_handler(array('Activerules_Exception', 'handler'));
 
 // Enable ActiveRulesa error handling, converts all PHP errors to exceptions.
-//set_error_handler(array('Activerules_AR', 'error_handler'));
+set_error_handler(array('Activerules_AR', 'error_handler')); 
 
 // Enable the ActiveRules shutdown handler, which catches E_FATAL errors.
 //register_shutdown_function(array('Activerules_AR', 'shutdown_handler'));

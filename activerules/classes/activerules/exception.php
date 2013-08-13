@@ -113,8 +113,9 @@ class Activerules_Exception extends Exception {
 
 			echo $error;
 			echo '<pre>';
-			foreach($trace as $stack)
+			foreach($trace as $ix => $stack)
 			{
+				echo "\n============ Stack Position:  $ix ===============";
 				echo "\n".Dbg::path($stack['file']).' ['.$stack['line'].']';
 				echo "\n".$stack['class'].'::'.$stack['function'];
 				echo "\n";

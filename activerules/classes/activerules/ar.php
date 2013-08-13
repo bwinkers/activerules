@@ -203,7 +203,7 @@ class Activerules_AR {
 			 * Create the Site class.
 			 * If we passed in a site name it would load that site.
 			 */
-			$site = Site::factory()->set_storage(self::$_storage);
+			$site = Site::factory(self::$_storage);
 			
 			
 			/**
@@ -244,7 +244,7 @@ class Activerules_AR {
 		}
 		catch ( Exception $e)
 		{
-			echo __FILE__.' '.__LINE__; // var_export($e);
+			Activerules_Exception::handler($e);// var_export($e);
 		}
 
 		/**
@@ -260,7 +260,7 @@ class Activerules_AR {
 	 */
 	public function process_request()
 	{
-		
+		echo 'test';
 	}
 	
 	/**
