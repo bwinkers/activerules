@@ -11,7 +11,8 @@
 interface Activerules_Interface_Site { 
 		
 	/**
-	 * The site interface must provide a factory interface
+	 * The site interface must provide a factory method.
+	 * The storage object would be something like 
 	 */
 	public static function factory($storage=NULL);
 	
@@ -23,6 +24,8 @@ interface Activerules_Interface_Site {
 	/**
 	 * Return a config variable for a site.
 	 * This should take a dot notated array path and return the configured value.
+	 * 
+	 * ANY module can access this through the static AR::site method.
 	 */
 	public function config($dot_path, $default=FALSE);
 	

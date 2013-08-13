@@ -189,7 +189,6 @@ class Activerules_AR {
 		return self::$instance;
 	}
 	
-	
 	/**
 	 * Start the ActiveRules processing
 	 * 
@@ -204,12 +203,6 @@ class Activerules_AR {
 			 * If we passed in a site name it would load that site.
 			 */
 			$site = Site::factory(self::$_storage);
-			
-			
-			/**
-			 * ActiveRules doesn't know how the Site class fucntions so it can only initialize it..
-			 */
-			$site->init_site();
 
 			/**
 			 * Set the sites error_reporting
@@ -244,7 +237,7 @@ class Activerules_AR {
 		}
 		catch ( Exception $e)
 		{
-			Activerules_Exception::handler($e);// var_export($e);
+			Activerules_Exception::handler($e);
 		}
 
 		/**
@@ -260,7 +253,14 @@ class Activerules_AR {
 	 */
 	public function process_request()
 	{
-		echo 'test';
+		try
+		{
+			self::$_site->takeover_request();
+		}
+		catch( Exception $e)
+		{
+			Activerules_Exception::handler($e);
+		}
 	}
 	
 	/**
@@ -536,7 +536,6 @@ class Activerules_AR {
 	{
 		ob_end_clean();
 		exit(1);
-		
 	}
 		
 	/**

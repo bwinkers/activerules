@@ -46,15 +46,15 @@ class Activerules_Site implements Interface_Site {
 		$site->_determine_host();
 
 		// get the Site alias from the Hostname
-		$site_alias = $site->hostname->get_site_alias();
+		$site_alias = $site->_hostname->get_site_alias();
 
 		// This will return a hostname config array or FALSE
-		$site_data = $site_storage->load_groups('site'.DIRECTORY_SEPARATOR.$site_alias);
+		$site_data = $storage->load_groups('site'.DIRECTORY_SEPARATOR.$site_alias);
 
 		if($site_data)
 		{
 			// merge host data and site data
-			$merged_configs = array_merge_recursive($site->hostname->get_host_data(), $site_data);
+			$merged_configs = array_merge_recursive($site->_hostname->get_host_data(), $site_data);
 			
 			$site->_config = $merged_configs;
 		}
@@ -161,6 +161,14 @@ class Activerules_Site implements Interface_Site {
 	}
 	
 	/**
+	 * Prevent any bad calls from throwing fatal errors
+	 */
+	public function __call($name, $arguments=NULL) 
+	{
+		
+	}
+	
+	/**
 	 * This stes the private variable hostname object.
 	 * It calls the Hostname object without a hostname so the default HTPP_HOST is used within the Hostname object.
 	 */
@@ -192,6 +200,23 @@ class Activerules_Site implements Interface_Site {
 
 		// Hostname obejcts returns FALSE if its unsupported.
 		return $hostname;
+	}
+	
+	public function takeover_request()
+	{
+		Dbg::it('The site will handle things from here on.');
+		
+		/*
+		 * The Site believes the correct thing to do is:
+		 * 	1. Create a scrubbed Request object
+		 * 	2. Use the Request to determine the Route
+		 *		This will result in a routed request.
+		 *		The Router object will remain part of the Request
+		 * 	3. Pass the Request with routed changes to the class and method defined in the route.
+		 *  4. Create a Response within the request
+		 *  5. Output the response correctly.		  
+		 */
+			
 	}
 	
 	/**

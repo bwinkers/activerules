@@ -75,7 +75,7 @@ set_exception_handler(array('Activerules_Exception', 'handler'));
 set_error_handler(array('Activerules_AR', 'error_handler')); 
 
 // Enable the ActiveRules shutdown handler, which catches E_FATAL errors.
-//register_shutdown_function(array('Activerules_AR', 'shutdown_handler'));
+// register_shutdown_function(array('Activerules_AR', 'shutdown_handler'));
 
 /**
  * Define config array based on the bootstrap configs
@@ -113,13 +113,20 @@ $ar_bootstrap_configs = array(
  * But it needs to provide core services to various sub levels
  *     
  */
-	$ar = AR::instance()
+	//try
+	//{
+		$ar = AR::instance()
 		// Configure the ActiveRules
 		->configure($ar_bootstrap_configs)
 		// Load the Site
 		->load_site()
 		// have the Site process the Request	
 		->process_request();
+	//} 
+	//catch( Exception $e)
+	//{
+	//	echo Activerules_Exception::handler($e);
+	//}
 /**
  * Flush the bufer to get rid of any screen output at this level
  */

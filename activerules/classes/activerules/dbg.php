@@ -45,10 +45,10 @@ class Activerules_Dbg {
 		}
 		
 		//Use debug backtrace to find the file and line where this debug was called
-		$trace =debug_backtrace();
+		$trace = debug_backtrace();
 		
 		// Echo out the file and line 
-       	echo "\n<br>Debug: ".$trace[$position]['file'].' :: '.$trace[$position]['line'];
+       	echo "\n<br>Debug: ".Dbg::path($trace[$position]['file']).' :: '.$trace[$position]['line'];
 
 		echo '<pre>';
 		var_export($var);

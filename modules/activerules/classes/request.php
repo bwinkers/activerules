@@ -1,10 +1,7 @@
 <?php defined('AR_VERSION') or die('No direct script access.');
 /**
- * Config File
- * 
- * Pull configuration from a file.
- * There is no paradigm supported for writing config files.
- * You should assume the server has no writeable local storage.
+ * Request Interface
+ * This will define the core functionality required of the Request class.
  *
  * @package    ActiveRules
  * @author     Brian Winkers
