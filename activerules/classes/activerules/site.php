@@ -52,9 +52,9 @@ class Activerules_Site implements Interface_Site {
 	 */
 	public function init_site()
 	{
-		// Determine the hostname
+		// Determine the hostname.
 		$this->_determine_host();
-		
+
 		// get the site alias from the hostname
 		$site_alias = $this->_hostname->get_site_alias();
 
@@ -93,7 +93,7 @@ class Activerules_Site implements Interface_Site {
 	public function set_storage($storage)
 	{
 		$this->_storage = $storage;
-		
+
 		return $this;
 	}
 	
@@ -158,7 +158,7 @@ class Activerules_Site implements Interface_Site {
 	
 	/**
 	 * Check if the hostname is supported.
-	 * If it does exist return a Hostname object.
+	 * If it does exist return a Hostname objects
 	 * 
 	 * @return Hostname object
 	 */
@@ -166,12 +166,12 @@ class Activerules_Site implements Interface_Site {
 	{
 		// To determine the site we need to get a supported hostname object
 		$hostname = new Hostname();
-	
+
 		// Pass the storage object to the hostname object
 		$hostname->set_storage($this->_storage);
-
+	
 		// Process the hostname
-		$hostname->process('test','multi', array('my'=>'test','is'=>'done'));
+		$hostname->process();
 
 		// Hostname obejcts returns FALSE if its unsupported.
 		return $hostname;

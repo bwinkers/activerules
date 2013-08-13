@@ -102,13 +102,10 @@ class Activerules_Hostname implements Interface_Hostname {
 	 */
 	public function process($hostname=NULL)
 	{
-		if($hostname===NULL)
-		{
-			$hostname = $this->_requested_hostname;
-		}
+		$hostname = $this->_original_hostname;
 
 		// check if the host is configured
-		$host_check = $this->_configured_hostname($hostname);
+		$host_check = $this->_is_configured_hostname($hostname);
 
 		if($host_check)
 		{
@@ -121,13 +118,13 @@ class Activerules_Hostname implements Interface_Hostname {
 			// We remove the site_alias and set the rest of the host data in the object
 			unset($host_check['data']['site_alias']);
 			$this->_host_data = $host_check['data'];
-			
+
 			// We also check to see if the host supports subhosts
 			// and if subhosts are supported how many levels are supported
 			if(isset($host_check['data']['subdomain_levels']))
 			{
 				// trim the subdomains to the maximum level
-				$remainder = trim(rtrim($this->_requested_hostname, $this->_configured_hostname), '.');
+				$remainder = trim(rtrim($this->_original_hostname, $this->_configured_hostname), '.');
 				
 				// Create an arry on the remaining dot separated parts
 				$remaining_parts = explode('.', $remainder);
@@ -148,10 +145,8 @@ class Activerules_Hostname implements Interface_Hostname {
 			{
 				$this->_redirect_host($host_check['data']['redirect']);
 			}
-		}
-		else
-		{
-			echo '404';
+			
+			return FALSE;
 		}
 	}
 	
@@ -165,7 +160,7 @@ class Activerules_Hostname implements Interface_Hostname {
 			$hostname = $_SERVER['HTTP_HOST'];
 		}
 
-		$this->_requested_hostname = $hostname;
+		$this->_original_hostname = $hostname;
 	}
 	
 	/**
@@ -251,7 +246,7 @@ class Activerules_Hostname implements Interface_Hostname {
 	 * Determines if there is a valid config for this hostname.
 	 * This method is private becasue nothing should care HOW Hostname goes about its business.
 	 */
-	private function _configured_hostname($hostname)
+	private function _is_configured_hostname($hostname)
 	{
 		// If the host is valid there will be a config group with that name
 
@@ -275,7 +270,7 @@ class Activerules_Hostname implements Interface_Hostname {
 				// Strip off the first part of the domain and check that domain
 				$next_hostname = substr($hostname, $dot_location+1);
 
-				return $this->_configured_hostname($next_hostname);
+				return $this->_is_configured_hostname($next_hostname);
 			}
 		}
 		

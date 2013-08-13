@@ -10,8 +10,8 @@
  * @copyright  (c) 2005-2013 Brian Winkers
  */
 class Activerules_AR {
-	
-		// Security check that is added to all generated PHP files
+		
+	// Security check that is added to all generated PHP files
 	const FILE_SECURITY = '<?php defined(\'AR_VERSION\') or die(\'No direct script access.\');';
 
 	/**
@@ -108,15 +108,6 @@ class Activerules_AR {
 	private function __construct()
 	{
 		/* PRIVATE */
-		// Enable ActiveRules exception handling, adds stack traces and error source.
-		set_exception_handler(array('Activerules_Exception', 'handler'));
-
-		// Enable ActiveRulesa error handling, converts all PHP errors to exceptions.
-		//set_error_handler(array('AR', 'error_handler'));
-
-		// Enable the ActiveRules shutdown handler, which catches E_FATAL errors.
-		//register_shutdown_function(array('Activerules_AR', 'shutdown_handler'));
-
 	}
 	
 	/**
@@ -191,7 +182,7 @@ class Activerules_AR {
 		{
 			self::set_logger($config_array['logger']);
 		}
-		
+
 		/**
 		 * Return an the current object for chaining
 		 */
@@ -212,13 +203,19 @@ class Activerules_AR {
 			 * Create the Site class.
 			 * If we passed in a site name it would load that site.
 			 */
-			$site = Site::factory()->set_storage(self::$_storage)->init_site();
+			$site = Site::factory()->set_storage(self::$_storage);
+			
+			
+			/**
+			 * ActiveRules doesn't know how the Site class fucntions so it can only initialize it..
+			 */
+			$site->init_site();
 
 			/**
 			 * Set the sites error_reporting
 			 */
 			error_reporting($site->config('errors.error_reporting', 0));
-
+	
 			/**
 			 * Load the modules from the Site host config
 			 */
@@ -227,7 +224,7 @@ class Activerules_AR {
 			if($modules)
 			{
 				foreach($modules as $module)
-				{
+				{	
 					$mod_path = DOCROOT.'modules'.DIRECTORY_SEPARATOR.$module.DIRECTORY_SEPARATOR;
 
 					$this->add_module($mod_path);
@@ -237,7 +234,7 @@ class Activerules_AR {
 			// Bootstrap the modules
 			// We wait until all modules are loaded to reduce issues with load order dependencies.
 			self::_bootstrap_modules();
-			
+		
 			/**
 			 * Store the Site object witihn the AR singleton
 			 * The Site object also has the Hostname object avilable to it.
@@ -245,15 +242,25 @@ class Activerules_AR {
 			self::$_site = $site;
 
 		}
-		catch ( Activerules_Exception $e)
+		catch ( Exception $e)
 		{
-			var_export($e);
+			echo __FILE__.' '.__LINE__; // var_export($e);
 		}
-		
+
 		/**
 		 * Return an the current object for chaining
 		 */
 		return self::$instance;
+	}
+	
+	
+	/**
+	 * Use the Site Route to determine how to process the request.
+	 * Call that method with the request objects and the Activerules Site Host boot process is complete.
+	 */
+	public function process_request()
+	{
+		
 	}
 	
 	/**
