@@ -212,7 +212,7 @@ class Activerules_AR {
 			/**
 			 * Load the modules from the Site host config
 			 */
-			$modules = $site->get_modules();
+			$modules = $site->config('modules', FALSE);
 
 			if($modules)
 			{
@@ -230,7 +230,7 @@ class Activerules_AR {
 		
 			/**
 			 * Store the Site object witihn the AR singleton
-			 * The Site object also has the Hostname object avilable to it.
+			 * The Site object also has the Hostname object available to it.
 			 */
 			self::$_site = $site;
 

@@ -11,23 +11,19 @@
 interface Activerules_Interface_Router { 
 		
 	/**
-	 * The Router interface must provide a factory method.
-	 * The storage object would be something like 
+	 * Route a Request object
 	 */
-	public static function factory($storage=NULL);
+	public function route_request($request);
 	
 	/**
-	 * The Router interface must provide a factory interface
+	 * Convert a translated URL into a code Route
 	 */
-	public function Router_alias();
-
+	public function reverse_route($route, $context);
+	
 	/**
-	 * Return a config variable for a Router.
-	 * This should take a dot notated array path and return the configured value.
-	 * 
-	 * ANY module can access this through the static AR::Router method.
+	 * Take a code Route and return the translated route.
 	 */
-	public function config($dot_path, $default=FALSE);
+	public function translate_route($route, $context);
 	
 }
 	

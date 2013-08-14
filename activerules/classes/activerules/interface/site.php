@@ -29,6 +29,12 @@ interface Activerules_Interface_Site {
 	 */
 	public function config($dot_path, $default=FALSE);
 	
+	/**
+	 * Takeover processing the request.
+	 * ActiveRules shouldn't have sent any headers or output yet
+	 */
+	public function takeover_request();
+	
 }
 	
 	

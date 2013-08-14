@@ -91,20 +91,6 @@ class Activerules_Site implements Interface_Site {
 	}
 	
 	/**
-	 * get the modules used by this site
-	 * @return type 
-	 */
-	public function get_modules()
-	{
-		if(isset($this->_config['modules']))
-		{
-			return $this->_config['modules'];
-		}
-		
-		return FALSE;
-	}
-	
-	/**
 	 * Set the storage method used for site configs.
 	 * This is not in the Interface becasue it isn't intrinsic tot he functionality of a site.
 	 */
@@ -216,6 +202,12 @@ class Activerules_Site implements Interface_Site {
 		 *  4. Create a Response within the request
 		 *  5. Output the response correctly.		  
 		 */
+		
+		$request = new Request;
+		
+		$router = new Router;
+		
+		$response = new Response;
 			
 	}
 	
