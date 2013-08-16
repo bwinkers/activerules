@@ -1,12 +1,14 @@
 <?php defined('AR_VERSION') or die('No direct script access.');
 /**
- * Config File
- * 
- * Pull configuration from a file.
- * There is no paradigm supported for writing config files.
- * You should assume the server has no writeable local storage.
+ * Router object.
+ * This represents all facets of the Router.
+ * - Router Interface (Interface_Router)
+ * - Router Exceptions (Exception_Router)
+ * - Router Methods
+ * - Router Data
  *
- * @package    ActiveRules
+ * @package		ActiveRules
+ * @subpackage	Business Objects
  * @author     Brian Winkers
  * @copyright  (c) 2005-2013 Brian Winkers
  */

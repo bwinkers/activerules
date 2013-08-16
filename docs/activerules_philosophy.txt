@@ -48,6 +48,9 @@ Consistent Coding
 	In the previous paradigm we may have allowed the browser to start loading JS and CSS earlier but once we sent header info we were committed to a given path response path.
 	With the desire to load most JS and CSS as late as possible this is less of an issue and browser support was always questionable.
 
+7. Feature wraps
+
+	All features must wrapped so that they can be enabled and disabled based upon any number of request variables. 
 
 Class Definitions and Relations
 -------------------------------
@@ -62,9 +65,21 @@ Interfaces SHOULD be in the 'interfaces' subdirectory of a 'classes' directory.
 
 Abstract and concrete classes should be defined in the 'classes' directory of activerules or a module.
 
+### Exception Classes
+
+All Classes should implement their own Exception class.
+It can extend the Activerules_Exception Class or provide its own implementation.
+A class should use its exception class to handle internal exceptions.
+It is appropriate for the Exception class defined at the interface class level to handle all exceptions below it.
+
+Exception classes  SHOULD be in the 'exception' subdirectory of a 'classes' directory.
+
 
 Documentation
 -------------
 
-
+Markdown formatted long documentation style. (like this doc)
 	
+phpDocumentor2 code commenting.
+
+activerules.com

@@ -1,9 +1,14 @@
 <?php defined('AR_VERSION') or die('No direct script access.');
 /**
- * Response Interface
- * This will define the core functionality required of the Response class.
+ * Response object.
+ * This represents all facets of the Response.
+ * - Response Interface (Interface_Response)
+ * - Response Exceptions (Exception_Response)
+ * - Response Methods
+ * - Response Data
  *
- * @package    ActiveRules
+ * @package		ActiveRules
+ * @subpackage	Business Objects
  * @author     Brian Winkers
  * @copyright  (c) 2005-2013 Brian Winkers
  */
