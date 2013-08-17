@@ -12,24 +12,24 @@ class Activerules_Site implements Interface_Site {
 	 * Information about the requested, configured and supported hostname.
 	 * @var object Hostname object
 	 */
-	private $_hostname;
+	protected $_hostname;
 	
 	/**
 	 * This is used for site specfic directories etc.
 	 * @var string The site alias 
 	 */
-	private $_site_alias;
+	protected $_site_alias;
 	
 	/**
 	 * Location where site specific
 	 * @var object Config object
 	 */
-	private $_storage;
+	protected $_storage;
 	
 	/**
 	 * Config populated from storage or cache
 	 */
-	private $_config;
+	protected $_config;
 
 	/**
 	 * Return a site object.
@@ -68,7 +68,7 @@ class Activerules_Site implements Interface_Site {
 	 *
 	 * @return $this 
 	 */
-	private function _init_site()
+	protected function _init_site()
 	{
 		// Determine the hostname.
 		$this->_determine_host();
@@ -141,7 +141,7 @@ class Activerules_Site implements Interface_Site {
 	/**
 	 * Load the site
 	 */
-	private function __construct($storage=NULL)
+	protected function __construct($storage=NULL)
 	{
 		$this->_storage = $storage;
 	}
@@ -155,10 +155,10 @@ class Activerules_Site implements Interface_Site {
 	}
 	
 	/**
-	 * This stes the private variable hostname object.
+	 * This stes the protected variable hostname object.
 	 * It calls the Hostname object without a hostname so the default HTPP_HOST is used within the Hostname object.
 	 */
-	private function _determine_host()
+	protected function _determine_host()
 	{
 		$hostname = $this->_valid_hostname();
 
@@ -173,7 +173,7 @@ class Activerules_Site implements Interface_Site {
 	 * 
 	 * @return Hostname object
 	 */
-	private function _valid_hostname()
+	protected function _valid_hostname()
 	{
 		// To determine the site we need to get a supported hostname object
 		$hostname = new Hostname();

@@ -14,12 +14,6 @@ interface Activerules_Interface_Request {
 	public function get_data($dot_path, $default);
 	
 	
-	public function set_doc_type($type);
-	
-	
-	public function get_doc_type();
-	
-	
 	public function set_protocol($protocol);
 	
 	

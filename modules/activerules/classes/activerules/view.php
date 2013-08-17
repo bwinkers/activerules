@@ -1,4 +1,4 @@
-<?php
+<?php  defined('AR_VERSION') or die('No direct script access.');
 /**
  * ActiveRules View library.
  *
