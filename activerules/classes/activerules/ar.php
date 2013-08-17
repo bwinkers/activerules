@@ -15,46 +15,6 @@ class Activerules_AR {
 	const FILE_SECURITY = '<?php defined(\'AR_VERSION\') or die(\'No direct script access.\');';
 
 	/**
-	 * @var  boolean  True if Kohana is running from the command line
-	 */
-	public static $is_cli = FALSE;
-
-	/**
-	 * @var  boolean  True if Kohana is running on windows
-	 */
-	public static $is_windows = FALSE;
-
-	/**
-	 * @var  boolean  True if [magic quotes](http://php.net/manual/en/security.magicquotes.php) is enabled.
-	 */
-	public static $magic_quotes = FALSE;
-
-	/**
-	 * @var  boolean  Should errors and exceptions be logged
-	 */
-	public static $log_errors = FALSE;
-
-	/**
-	 * @var  boolean  TRUE if PHP safe mode is on
-	 */
-	public static $safe_mode = FALSE;
-
-	/**
-	 * @var  string
-	 */
-	public static $content_type = 'text/html';
-
-	/**
-	 * @var  string  character set of input and output
-	 */
-	public static $charset = 'utf-8';
-
-	/**
-	 * @var  boolean  Whether to use internal caching for find_file
-	 */
-	public static $caching = FALSE;
-
-	/**
 	 * @var  boolean  Enable catching and displaying PHP errors and exceptions by ActiveRules
 	 */
 	public static $trap_errors = TRUE;
@@ -65,9 +25,14 @@ class Activerules_AR {
 	public static $shutdown_errors = array(E_PARSE, E_ERROR, E_USER_ERROR);
 
 	/**
-	 * @var  Log  logging object
+	 * @var  Logging object
 	 */
-	public static $log;
+	public static $_log;
+	
+	/**
+	 * @var  caching object
+	 */
+	public static $_cache;
 	
 	/**
 	 * @var Site object
@@ -75,12 +40,9 @@ class Activerules_AR {
 	public static $_site = NULL;
 
 	/**
-	 * @var  boolean  Has init been called?
-	 */
-	protected static $_init = FALSE;
-
-	/**
 	 * @var  array   Currently active modules
+	 * Initially this is populated by the Site.
+	 * Then module initialization may add to it
 	 */
 	protected static $_modules = array();
 
@@ -391,7 +353,7 @@ class Activerules_AR {
 		// Create a list of places to look by combining modules before defined paths
 		$places = array_merge(self::$_paths, self::$_modules);
 
-		if (self::$caching === TRUE AND isset(self::$_files[$path.($array ? '_array' : '_path')]))
+		if (self::$_cache === TRUE AND isset(self::$_files[$path.($array ? '_array' : '_path')]))
 		{
 			// This path has been cached
 			return self::$_files[$path.($array ? '_array' : '_path')];
@@ -433,7 +395,7 @@ class Activerules_AR {
 			}
 		}
 
-		if (self::$caching === TRUE)
+		if (self::$_cache === TRUE)
 		{
 			// Add the path to the cache
 			self::$_files[$path.($array ? '_array' : '_path')] = $found;
