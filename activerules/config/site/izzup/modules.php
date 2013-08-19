@@ -1,3 +1,3 @@
 <?php
-$config = array('activerules','caching');
+$config = array('activerules','Psr');
 ?>

@@ -1,4 +1,8 @@
-<?php defined('AR_VERSION') or die('No direct script access.');
+<?php 
+// Security check to make sure this file nevfer gets laoded directly through a browser
+defined('AR_VERSION') or die('No direct script access.');
+
+use Psr\Log\LoggerInterface;
 /**
  * AR (ActiveRules) library.
  * This gets loaded as a singleton for all request.
@@ -180,7 +184,7 @@ class Activerules_AR {
 			{
 				foreach($modules as $module)
 				{	
-					$mod_path = DOCROOT.'modules'.DIRECTORY_SEPARATOR.$module.DIRECTORY_SEPARATOR;
+					$mod_path = DOCROOT.'vendor'.DIRECTORY_SEPARATOR.$module.DIRECTORY_SEPARATOR;
 
 					$this->add_module($mod_path);
 				}
@@ -188,6 +192,7 @@ class Activerules_AR {
 
 			// Bootstrap the modules
 			// We wait until all modules are loaded to reduce issues with load order dependencies.
+			// There may still be load order dependencie based on their boostrap needs.
 			self::_bootstrap_modules();
 		
 			/**
@@ -298,6 +303,32 @@ class Activerules_AR {
 			Activerules_Exception::handler($e);
 			die;
 		}
+	}
+	
+	public static function autoload_psr($className)
+	{
+		$className = ltrim($className, '\\');
+		$fileName  = '';
+		$namespace = '';
+		if ($lastNsPos = strrpos($className, '\\')) {
+			$namespace = substr($className, 0, $lastNsPos);
+			$className = substr($className, $lastNsPos + 1);
+			$fileName  = str_replace('\\', DIRECTORY_SEPARATOR, $namespace) . DIRECTORY_SEPARATOR;
+		}
+
+		$fileName .= str_replace('_', DIRECTORY_SEPARATOR, $className) . EXT;
+echo $fileName;
+		$path = self::find_file('classes', $fileName);
+echo $path;
+			if ($path)
+			{
+				// Load the class file
+				require $path;
+
+				// Class has been found
+				return TRUE;
+			}
+
 	}
 	
 	/**

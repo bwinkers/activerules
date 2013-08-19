@@ -1,4 +1,4 @@
-<?php
+ <?php
 /**
  * Copyright 2013 - Brian Winkers
  */
@@ -68,6 +68,11 @@ require_once(ACTIVEPATH.'classes'.DIRECTORY_SEPARATOR.'activerules'.DIRECTORY_SE
  */
 spl_autoload_register(array('Activerules_AR', 'autoload'));
 
+/**
+ * Add the PSR.0 autoloader
+ */
+spl_autoload_register(array('Activerules_AR', 'autoload_psr'));
+
 // Enable ActiveRules exception handling, adds stack traces and error source.
 set_exception_handler(array('Activerules_Exception', 'handler'));
 
@@ -122,6 +127,9 @@ $ar_bootstrap_configs = array(
 		->load_site()
 		// have the Site process the Request	
 		->process_request();
+		
+
+		//$logger = new Psr_Log_NullLogger();
 	//} 
 	//catch( Exception $e)
 	//{
