@@ -1,0 +1,131 @@
+ActiveRules Flow
+================
+
+index.php
+---------
+
+1.	Output buffer
+
+	We start an output buffer to catch any accidental echos at this level.
+	This gets flushed at the end of the index file if we get that far.
+
+2.	Set ActiveRules startup Constants
+
+	We set AR_START_TIME and AR_START_MEMORY as references.
+	Profiling and reporting functions can reference these constants.
+	AR_START_TIME provides a timestamp guaranteed to be the consistent throughout execution. 
+
+3.	Define the PHP extension 
+
+	We set EXT as '.php' to append to strings for class filenames etc.
+	It would also help if we ever head to support using a different extension like '.php6'.
+
+4.	Define the ActiveRules version
+
+	A check AR_VERSION being defined is at the top of every file but the index.php file.
+	This prevents those files from being called directly regardless of the server setup or security.
+	This version number can also be referenced for enabling/disabling features.
+	To provide granularity the version number should contain a major and minor version number. (7.0, 7.1, 7.2, etc)
+
+5.	Define the DOCROOT
+
+	This is the root install directory.
+	ActiveRules is written to be run inside a PHP container, meaning that the index file is at the web root and all other files are in sub-directories.
+	This runs counter to the well accepted practice of having most of the application files outside of the web root.
+
+6.	Include the bootstrap config
+
+	The first thing this provides is the location of the 'activerules' directory.
+	The part of ActiveRules responsible for loading the proper modules for a site is here.
+
+	This also defines three possible services for ActiveRules to use.
+	These are storage, caching and logging services.
+	These can be used to provide services to underlying sites, modules or applications.
+	Though for good separation of responsibility it is strongly suggested that at minimum those be defined separately at the site level.
+	Best practices would have each module and application define those service independently as well.
+
+	At minimum the 'storage' needs to be configured so that AR can find the site configuration data.
+
+7.	Define ACTIVEPATH 
+
+	This points to the realpath of activerules as defined in the bootstrap config.
+
+8.	Require the Activerules_AR class
+
+9.	Register the ActiveRules class autoloader
+
+	This allows us to use classes without having to explicitly include their files first.
+	It also supports a cascading file system that allows modules to overload core ActiveRules functionality.
+	The basic concept here was borrowed from Kohana.
+
+10. Create a boostrap config array
+
+	This array is used to pass the services defined in bootstrap config to the AR class. 
+
+11. Create an AR (ActiveRules) instance
+
+	We pass it the bootstrap config array and load the Site.
+	AR does pass its defined storage to Site since it must have a way to find stored data.
+
+	The AR instance is a singleton. 
+	It's purpose is to handle passing a web request to the defined application or module for a given site.
+	There shouldn't need to be a whole lot of singletons in the code.
+
+
+AR Class
+--------
+
+### instance()
+
+This returns the singleton instance and populates static variables.
+
+### __construct()
+
+Currently nothing happens here
+
+### configure($ar_bootstrap_configs)
+
+We use the bootstrap configured services to load a storage class.
+
+### load_site()
+
+This creates $site as a newly initialized Site object instance, passing it the AR storage object.
+The site alias is determined within the Site object by creating a Hostname object.
+This Hostname object remains part of the static AR objects static Site.
+
+The Site and Site Hostname objects of the initial web request can be accessed as needed by ANY module using the AR static method calls.
+These are meant to be treated as global variables that represent this unique request.
+This is the core functionality of ActiveRules from a framework perspective.
+It allows setting multi-dimensional variables that can be used to dynamically alter the code execution at any point within a module.
+
+
+Site Class
+----------
+
+### factory()
+
+
+### __construct()
+
+
+### set_storage()
+
+
+### init_site()
+
+
+Hostname Class
+--------------
+
+### process()
+
+
+	
+
+	
+Router
+------
+
+### route_request($request)
+
+### 

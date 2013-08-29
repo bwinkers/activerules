@@ -1,0 +1,6 @@
+# This file should provide a valid rewrite for an AppFog PHP instance.
+# This routes everything that doesn't route to a real file to the index.php file
+RewriteEngine on
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*) /index.php [L]

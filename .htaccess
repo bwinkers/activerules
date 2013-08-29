@@ -1,0 +1,5 @@
+# This file should provide a valid rewrite for an AppFog PHP instance
+# This addresses the issue by AppFog using the container root as webroot.
+RewriteEngine on
+RewriteCond %{REQUEST_URI} !webroot/
+RewriteRule (.*) /webroot/$1 [L]

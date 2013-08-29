@@ -1,0 +1,63 @@
+ActiveRules Technologies
+================
+
+Language
+--------
+
+* PHP
+
+Cloud Optimized
+---------------
+* MongoDB Logging
+* PHP Container
+
+
+Generation Conscious
+--------------------
+Each Site container within the PHP application container can use a different version of the same module. They can also share modules.
+
+
+Multi-Site
+----------
+* Hostname based resolution
+* Site indepedent caching from the core up
+
+
+Integration
+------------
+* PSR(0-3) Compliant
+* Composer
+* Symfony
+* Zend
+* 
+
+
+Deployment
+----------
+
+* AppFog
+* Heroku
+* PagodaBox
+
+
+Development
+-----------
+
+* GitHub
+* Cloud9
+* phpDocumentor 2
+
+Storage
+-------
+
+* MongoDB
+* ClearDB
+* Rackspace Cloudfiles
+* Google Spreadsheets
+
+
+Content Management
+------------------
+* Advanced Localization library
+* Google spreadsheet based translation storage
+* Markdown formatted documents
