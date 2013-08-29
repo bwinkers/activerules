@@ -1,3 +1,5 @@
 # Boxfile is used by PagodaBox to define the environment
 web1:
+name: activerules
 php_version: 5.4.14
+document_root: webroot/
