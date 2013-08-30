@@ -16,7 +16,3 @@ define('AR_VERSION', '7.1');
 
 
 echo AR_VERSION;
-
-phpinfo();
-
-echo 'test';
