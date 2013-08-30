@@ -1,5 +1,0 @@
---- 
-document_root: webroot/
-name: activerules
-php_version: "5.4.14"
-web1: ~
