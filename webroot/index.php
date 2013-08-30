@@ -9,10 +9,43 @@
  */
 
 /**
- * Define the ActiveRules version number
+ * Define the ActiveRules version.
+ * Modules may use this to determien if they are properly supported.
+ * Files look for it as an indication the request was accessed through the index.php file
  */
 define('AR_VERSION', '7.1');
 
+/**
+ * Define the start time of the application, used for profiling.
+ */
+if ( ! defined('AR_START_TIME'))
+{
+	define('AR_START_TIME', microtime(TRUE));
+}
 
+/**
+ * Define the memory usage at the start of the application, used for profiling.
+ */
+if ( ! defined('AR_START_MEMORY'))
+{
+	define('AR_START_MEMORY', memory_get_usage());
+}
 
-echo AR_VERSION;
+/**
+ * Define PHP extension
+ */
+if ( ! defined('EXT'))
+{
+	define('EXT', '.php');
+}
+
+/**
+ * Define DOCROOT as the full path to the docroot
+ */
+define('DOCROOT', realpath(dirname(__FILE__)).DIRECTORY_SEPARATOR);
+
+echo DOCROOT;
+
+require_once('ActiveRules/Bootstrap/test'.EXT);
+
+echo EXT;
