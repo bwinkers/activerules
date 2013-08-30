@@ -44,10 +44,10 @@ if ( ! defined('EXT'))
  */
 define('DOCROOT', realpath(dirname(__FILE__)).DIRECTORY_SEPARATOR);
 
-echo DOCROOT;
+//echo DOCROOT;
 
 set_include_path(get_include_path() . PATH_SEPARATOR . '../vendor');
 
 require_once('ActiveRules/Bootstrap/test'.EXT);
 
-echo EXT;
+//echo EXT;
