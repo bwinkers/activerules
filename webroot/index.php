@@ -44,9 +44,17 @@ if ( ! defined('EXT'))
  */
 define('DOCROOT', realpath(dirname(__FILE__)).DIRECTORY_SEPARATOR);
 
-//echo DOCROOT;
+/**
+ * Include the bootstrap path first so its libraries take precedence.
+ */
+set_include_path(get_include_path() . PATH_SEPARATOR . '../bootstrap');
 
+/**
+ * Include the vendor path so we can consume PSR compliant libraries
+ */
 set_include_path(get_include_path() . PATH_SEPARATOR . '../vendor');
+
+
 
 require_once('ActiveRules/Bootstrap/test'.EXT);
 

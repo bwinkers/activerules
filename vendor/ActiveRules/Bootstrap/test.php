@@ -1,3 +1,3 @@
 <?php
-echo 'Found the test. PHP path edit fixed.';
+echo 'Found the VENDOR test.';
 ?>
