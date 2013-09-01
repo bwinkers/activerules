@@ -39,13 +39,22 @@ if ( ! defined('EXT'))
 	define('EXT', '.php');
 }
 
+spl_autoload_register(function ($classname) {
+    $classname = ltrim($classname, "\\");
+    preg_match('/^(.+)?([^\\\\]+)$/U', $classname, $match);
+    $classname = str_replace("\\", "/", $match[1])
+		. str_replace(array("\\", "_"), "/", $match[2])
+        . ".php";
+    include_once $classname;
+});
+
 /**
  * Define DOCROOT as the full path to the docroot
  */
 define('DOCROOT', realpath(dirname(__FILE__)).DIRECTORY_SEPARATOR);
 
 /**
- * Include the bootstrap path first so its libraries take precedence.
+ * Include the Core path first so its libraries take precedence.
  */
 set_include_path(get_include_path() . PATH_SEPARATOR . '../bootstrap');
 
@@ -54,8 +63,15 @@ set_include_path(get_include_path() . PATH_SEPARATOR . '../bootstrap');
  */
 set_include_path(get_include_path() . PATH_SEPARATOR . '../vendor');
 
+use ActiveRules\Core;
+use ActiveRules\Core\Site;
+
+$site = Site::singleton()->initialize();
+
+var_export($site);
+
+echo Site::version();
 
 
-require_once('ActiveRules/Bootstrap/test'.EXT);
 
 //echo EXT;
