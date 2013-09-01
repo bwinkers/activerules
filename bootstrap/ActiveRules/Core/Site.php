@@ -73,7 +73,7 @@ class Site {
 	 * 
 	 * @return object Self reference
 	 */
-	public function singleton()
+	public static function singleton()
 	{
 		if (!isset(self::$singleton)) 
 		{
