@@ -37,7 +37,7 @@ class Site {
      * The Host object representing the hostname
      */
     static protected $host;
-
+    
     /**
      * The constructor is protected by 
      */
@@ -54,12 +54,22 @@ class Site {
      */
     public function initialize($hostname=NULL)
     {
+        // If the hostname isn't provided use the SERVER HTTP HOST
         if(!$hostname) {           
             $hostname = $_SERVER['HTTP_HOST'];
         }
 
-        self::$configs = self::loadHost($hostname);
+        // Create a host object if configs are found for the host name
+        $host = self::loadHost($hostname);
+        
+        // Load the Site configs using the Hosts' site_alias
+        $site_configs = self::loadConfiguration($host->getConfig('site_alias'));
+        
+        $merged_configs = array_merge_recursive($host->getConfigs(), $site_configs);
+        
+        Debug::it($merged_configs);
 
+        // Return self reference for chaining
         return self::$singleton;
     }
 
@@ -72,7 +82,10 @@ class Site {
     public function loadHost($hostname)
     {
         $host = new Host($hostname);
+        
+        return $host;
     }
+    
 
     /**
      * Create a singleton instance of the Site class
@@ -90,6 +103,51 @@ class Site {
          * Return an the current object for chaining
          */
         return self::$singleton;
+    }
+    
+    /**
+     * Load all config files for a Site
+     */
+    private function loadConfiguration($site) 
+    {
+        $configs = array();
+        
+        // The directory where the site configs should be
+        $site_directory = SITE_CONFIG_DIR.DIRECTORY_SEPARATOR.'site'.DIRECTORY_SEPARATOR.$site;
+
+        // Does the site config directory exist?
+        if(is_dir($site_directory)) {
+           
+            // Create a new directory iterator
+			$dir = new \DirectoryIterator($site_directory);
+
+			foreach ($dir as $file)	{
+				// Get the file name
+				$filename = $file->getFilename();
+
+				if ($filename[0] === '.' OR $filename[strlen($filename)-1] === '~')	{
+					// Skip all hidden files and UNIX backup files
+					continue;
+				}
+                
+                // Only process PHP files
+                if($file->getExtension() == 'php') {
+                    // Relative filename is the array key
+                    $full_path = $site_directory.DIRECTORY_SEPARATOR.$filename;
+
+                    require_once($full_path);
+                    
+                    // Get the base filename to use for namespacing the config
+                    $config_key = $file->getBasename(".php");
+
+                    // Add the config to the array
+                    $configs[$config_key] = $config;
+                }
+			}
+        }
+        
+        // Return whatever the configs are
+        return $configs;
     }
 }
 ?>

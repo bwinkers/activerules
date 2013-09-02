@@ -26,30 +26,21 @@ class Host {
 	 * This is used for hostname specfic directories etc.
 	 * This is the hostname that refers back to this host
 	 */	
-	private $supported_hostname = FALSE;
+	private $supported_hostname = false;
 	
 	/**
 	 * This is the hostname a configuration was found for.
 	 * It may be lower than the original or supported hostanme, but never higher.
 	 */		
-	private $configured_hostname = FALSE;
+	private $configured_hostname = false;
 
-	/**
-	 * This is used for hostname specfic directories etc.
-	 */
-	private $site_alias;
-	
 	/**
 	 * This is the host config data array.
 	 * It will override any site level data.
 	 */
 	private $configs;
 
-	/**
-	 * This defines the number of sub domain levels supported 
-	 */
-	private $subdomain_levels = FALSE;
-	
+
 	/**
 	 * Return supported hostname.
 	 * Activerules supports dynamic domain structures.
@@ -80,15 +71,6 @@ class Host {
 	}
 	
 	/**
-	 * Return the site alias associated with this hostname.
-	 * Associating hostnames and sites is a core ActiveRules service.
-	 */
-	public function getSiteAlias()
-	{
-		return $this->site_alias;
-	}
-	
-	/**
 	 * Provides a config array for the host.
 	 * ActiveRules allows host level data to override site level data.
 	 */
@@ -98,47 +80,59 @@ class Host {
 	}
     
     /**
+	 * Return one config value
+	 */
+	public function getConfig($key, $default=false)
+	{
+		if(isset($this->configs[$key])) {
+            return $this->configs[$key];
+        }
+        
+        return $default;
+	}
+    
+    /**
 	 * $hostname string Hostname to start from or HTTP_HOST
 	 */
 	public function __construct($hostname=NULL)
 	{
-		if($hostname===NULL)
-		{
+		if($hostname===NULL) {
 			$hostname = $_SERVER['HTTP_HOST'];
 		}
+        
+        $this->original_hostname = $hostname;
 
 		$this->process($hostname);
 	}
 	
 	/**
-	 * Map a hostname to a supported hostname
-	 * 
-	 * @param object $hostname  Hostname object
+     * Look for hostname configs
+     * 
 	 * @return 
 	 */
-	public function process($hostname=NULL)
+	public function process($hostname)
 	{
-		$hostname = $this->original_hostname;
-
 		// check if the host has configuration data
 		$host_check = $this->hasConfiguration($hostname);
 
 		if($host_check)	{
+            
+            // At minimum we need a site defined
+			if(! isset($host_check['data']['site_alias'])) {
+                return false;
+            }
 			
 			// Set the hostname that was found
 			$this->configured_hostname = $host_check['hostname'];
 			
-			// At minimum we need a site defined
-			$this->site_alias = $host_check['data']['site_alias'];
 			
-			// We remove the site_alias and set the rest of the host data in the object
-			unset($host_check['data']['site_alias']);
-			$this->host_data = $host_check['data'];
+			
+			// Set the rest of the host data in the object
+			$this->configs = $host_check['data'];
 
 			// We also check to see if the host supports subhosts
 			// and if subhosts are supported how many levels are supported
-			if(isset($host_check['data']['subdomain_levels'])) {
-				
+			if(isset($host_check['data']['subdomain_levels'])) {				
 				// trim the subdomains to the maximum level
 				$remainder = trim(rtrim($this->original_hostname, $this->configured_hostname), '.');
 				
@@ -152,17 +146,16 @@ class Host {
 				$valid_parts = array_slice($remaining_parts, $num);
 				
 				// Assemble the longest supported domain name from the requested hostname
-				$this->supported_hostname = implode('.', $valid_parts).'.'.$this->configured_hostname;
+				$this->supported_hostname = trim(implode('.', $valid_parts).'.'.$this->configured_hostname, '.');
 			}
 			
 			// We then check to see if the host defines any redirections
 			// and if subhosts are supported how many levels are supported
-			if(isset($host_check['data']['redirect']))
-			{
-				$this->redirectHost($host_check['data']['redirect']);
+			if(isset($host_check['data']['redirect'])) {
+				//$this->redirectHost($host_check['data']['redirect']);
 			}
 			
-			return FALSE;
+			return false;
 		}
 	}
 	
@@ -197,7 +190,7 @@ class Host {
 			}
 		}
 		
-		return FALSE;
+		return false;
 	}
     
     /**
@@ -205,7 +198,23 @@ class Host {
      */
     private function loadConfiguration($hostname) 
     {
-        echo SITE_CONFIG_DIR;
+        // The fullpath to where the host file should be
+        $host_file = SITE_CONFIG_DIR.DIRECTORY_SEPARATOR.'host'.DIRECTORY_SEPARATOR.$hostname.EXT;
+
+        // Does the host file exist?
+        if(is_file($host_file)) {
+            // Load the host file
+            require_once($host_file);
+            
+            // Is there a config variable set.
+            if(isset($config)) {
+                // Return config array
+                return (array)$config;
+            }
+        }
+        
+        // If we didn't find anything return false
+        return false;
     }
 	
 	/** 
