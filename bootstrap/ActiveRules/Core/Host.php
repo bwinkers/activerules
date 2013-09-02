@@ -124,9 +124,7 @@ class Host {
 			
 			// Set the hostname that was found
 			$this->configured_hostname = $host_check['hostname'];
-			
-			
-			
+
 			// Set the rest of the host data in the object
 			$this->configs = $host_check['data'];
 
@@ -154,9 +152,9 @@ class Host {
 			if(isset($host_check['data']['redirect'])) {
 				//$this->redirectHost($host_check['data']['redirect']);
 			}
-			
-			return false;
 		}
+        
+        return false;
 	}
 	
 	/**

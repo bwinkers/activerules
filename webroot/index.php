@@ -78,14 +78,22 @@ set_include_path(get_include_path() . PATH_SEPARATOR . '../vendor');
 /**
  * Define where the Site Host configs are 
  */
-
 define('SITE_CONFIG_DIR', realpath('../config'));
+
+/**
+ * Define where the site applications are 
+ */
+define('SITE_APP_DIR', realpath('../sites'));
 
 /**
  * Create the static Site singleton representing the site of the original web request.
  */
 $site = Site::singleton()->initialize();
 
-Debug::it(Site::VERSION, 'Site version');
+if($front_controller = $site->front_controller())
+{
+    $app_front_controller = SITE_APP_DIR.DIRECTORY_SEPARATOR.$site->getConfig('site_alias').DIRECTORY_SEPARATOR.$front_controller;
+    echo $app_front_controller;
+    include($app_front_controller);
+}
 
-//echo EXT;

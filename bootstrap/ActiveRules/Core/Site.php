@@ -62,12 +62,18 @@ class Site {
         // Create a host object if configs are found for the host name
         $host = self::loadHost($hostname);
         
-        // Load the Site configs using the Hosts' site_alias
-        $site_configs = self::loadConfiguration($host->getConfig('site_alias'));
-        
-        $merged_configs = array_merge_recursive($host->getConfigs(), $site_configs);
-        
-        Debug::it($merged_configs);
+        if($host)
+        {
+            // Load the Site configs using the Hosts' site_alias
+            $site_configs = self::loadConfiguration($host->getConfig('site_alias'));
+
+            $merged_configs = array_merge_recursive($host->getConfigs(), $site_configs);
+            
+            self::$configs = $merged_configs;
+            
+            unset($host, $merged_configs, $site_configs);
+
+        }  
 
         // Return self reference for chaining
         return self::$singleton;
@@ -83,10 +89,48 @@ class Site {
     {
         $host = new Host($hostname);
         
-        return $host;
+        if($host->getSupported()) {
+            return $host;
+        }
+        
+        return false;
     }
     
-
+    /**
+	 * Return one config value
+	 */
+	public static function getConfig($dot_path=false, $default=false)
+	{
+		$array = self::$configs;
+        
+        if($dot_path) {
+            $keys = explode('.', $dot_path);
+            
+            // loop through each part and extract its value
+            foreach ($keys as $key) {
+                if (isset($array[$key])) {
+                    // replace current value with the child
+                    $array = $array[$key];
+                } else {
+                    // key doesn't exist, fail
+                    return $default;
+                }
+            }
+        }
+        
+        return $array;
+	}
+    
+    /**
+     * Determine if the site is valid enough to continue processing
+     * 
+     * @return boolean
+     */
+    public static function front_controller()
+    {  
+        return self::getConfig('routes.front_controller', false);
+    }
+   
     /**
      * Create a singleton instance of the Site class
      * 
