@@ -90,10 +90,12 @@ define('SITE_APP_DIR', realpath('../sites'));
  */
 $site = Site::singleton()->initialize();
 
-if($front_controller = $site->front_controller())
+if($site->valid())
 {
-    $app_front_controller = SITE_APP_DIR.DIRECTORY_SEPARATOR.$site->getConfig('site_alias').DIRECTORY_SEPARATOR.$front_controller;
-    echo $app_front_controller;
-    include($app_front_controller);
+    //$app_front_controller = SITE_APP_DIR.DIRECTORY_SEPARATOR.$site->getConfig('site_alias').DIRECTORY_SEPARATOR.$front_controller;
+    $request = new Zend\Http\Request;
+    
+    var_export($request);
+
 }
 

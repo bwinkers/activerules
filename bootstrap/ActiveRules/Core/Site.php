@@ -126,9 +126,9 @@ class Site {
      * 
      * @return boolean
      */
-    public static function front_controller()
+    public static function valid()
     {  
-        return self::getConfig('routes.front_controller', false);
+        return true;
     }
    
     /**
