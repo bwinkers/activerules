@@ -203,13 +203,13 @@ postgresql:
     databases: {  }
     adminer: 0
 mariadb:
-    install: '1'
+    install: '0'
     root_password: '123'
     adminer: 0
     databases: {  }
     version: '5.5'
 sqlite:
-    install: '1'
+    install: '0'
     adminer: 0
     databases: {  }
 mongodb:
