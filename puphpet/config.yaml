@@ -10,7 +10,7 @@ vagrantfile-local:
         network:
             private_network: 192.168.5.101
             forwarded_port:
-                MerJgFL7H5pC:
+                YhUCwgXFS7nl:
                     host: '7714'
                     guest: '22'
         post_up_message: ''
@@ -32,7 +32,7 @@ vagrantfile-local:
                     - '--hiera_config /vagrant/puphpet/puppet/hiera.yaml'
                     - '--parser future'
         synced_folder:
-            AIszpfVaa5Zm:
+            ZmTDyqiUrUs5:
                 source: ./
                 target: /var/www
                 sync_type: default
@@ -68,7 +68,7 @@ firewall:
     install: '1'
     rules: null
 apache:
-    install: '0'
+    install: '1'
     settings:
         user: www-data
         group: www-data
@@ -79,11 +79,9 @@ apache:
     modules:
         - rewrite
     vhosts:
-        65QJF2E59CRX:
-            servername: awesome.dev
-            serveraliases:
-                - www.awesome.dev
-            docroot: /var/www/awesome
+        vPvZ3EYlVcjm:
+            servername: dev.izzup.com
+            docroot: /var/www/public
             port: '80'
             setenv:
                 - 'APP_ENV dev'
@@ -101,13 +99,13 @@ apache:
             ssl_certs_dir: ''
     mod_pagespeed: 0
 nginx:
-    install: '1'
+    install: 0
     settings:
         default_vhost: 1
         proxy_buffer_size: 128k
         proxy_buffers: '4 256k'
     vhosts:
-        49bO6L9gjaer:
+        v0HboCZuP6wq:
             server_name: dev.izzup.com
             www_root: /var/www/activerules/public
             listen_port: '80'
@@ -169,7 +167,7 @@ drush:
 ruby:
     install: '1'
     versions:
-        p2dNguWP8BJM:
+        ZSbmZ9lTF0gs:
             version: ''
 nodejs:
     install: '0'
@@ -178,14 +176,14 @@ python:
     install: '1'
     packages: {  }
     versions:
-        vLvAFdaW4dzB:
+        DAQc6RlQI4yL:
             version: ''
 mysql:
-    install: 0
+    install: '1'
     root_password: '123'
     adminer: 0
     databases:
-        xj7xZo9UxPH9:
+        h2AYkpS9cMvr:
             grant:
                 - ALL
             name: dbname
@@ -209,7 +207,7 @@ mariadb:
     databases: {  }
     version: '5.5'
 sqlite:
-    install: '0'
+    install: '1'
     adminer: 0
     databases: {  }
 mongodb:
