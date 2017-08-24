@@ -1,2 +1,2 @@
 # activerules
-Moving to @ActiveRules
+Moving to [@ActiveRules](https://github.com/ActiveRules)
